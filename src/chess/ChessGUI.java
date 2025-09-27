@@ -6,6 +6,8 @@ import java.awt.*;
 public class ChessGUI extends JFrame {
     private JButton[][] boardSquares = new JButton[8][8];
 
+    Piece[][] board = StartingBoardData.getStartingBoardData(true);
+
     public ChessGUI() {
         setTitle("Chess");
         setSize(600, 600);
@@ -23,17 +25,17 @@ public class ChessGUI extends JFrame {
                 } else {
                     square.setBackground(Color.GRAY);
                 }
+//
+//                if (row == 0 && column == 3) {
+//                    square.setBackground(Color.PINK);
+//                }
+                if (board[row][column] != null) {
+                    square.setText(board[row][column].getClass().getSimpleName());
+                }
 
                 boardSquares[row][column] = square;
                 add(square);
             }
         }
-    }
-
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            ChessGUI gui = new ChessGUI();
-            gui.setVisible(true);
-        });
     }
 }

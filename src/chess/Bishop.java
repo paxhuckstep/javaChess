@@ -1,7 +1,7 @@
 package chess;
 
-public class Rook extends Piece {
-    public Rook(boolean isWhite) {
+public class Bishop extends Piece {
+    public Bishop(boolean isWhite) {
         super(isWhite);  // call Piece constructor
     }
 }

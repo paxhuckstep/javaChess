@@ -3,15 +3,15 @@ package chess;
 import javax.swing.*;
 import java.awt.*;
 
-public class ChessGUI extends JFrame {
+public class ChessGUI extends JPanel {
     private JButton[][] boardSquares = new JButton[8][8];
 
     Piece[][] boardData = StartingBoardData.getStartingBoardData(true);
 
     public ChessGUI() {
-        setTitle("Chess");
+//        setTitle("Chess");
         setSize(600, 600);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+//        setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(new GridLayout(8, 8));
 
         for (int row = 0; row < 8; row++) {

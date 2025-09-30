@@ -1,5 +1,7 @@
 package chess;
 
+import java.util.List;
+
 public abstract class Piece {
     protected boolean isWhite;
 
@@ -7,27 +9,13 @@ public abstract class Piece {
         this.isWhite = isWhite;
     }
 
-//    public abstract List<Square> generateMoveCandidates(int startRow, int startColumn);
-//
-//    public boolean isPathClear(int startRow, int startColumn, int endRow, int endColumn) {
-//        int rowStep = Integer.compare(endRow, startRow);       // +1, 0, or -1
-//        int colStep = Integer.compare(endColumn, startColumn); // +1, 0, or -1
-//
-//        int currentRow = startRow + rowStep;
-//        int currentColumn = startColumn + colStep;
-//
-//        while (currentRow != endRow || currentColumn != endColumn) {
-//            if (squares[currentRow][currentColumn] != null) { // square is occupied
-//                return false;
-//            }
-//            currentRow += rowStep;
-//            currentColumn += colStep;
-//        }
-//
-//        return true; // path is clear
-//    }
+    public String getSay() {
+        return " Something uncoded";
+    }
 
-
-//    public abstract boolean canMove(int startRow, int startColumn, int endRow, int endColumn);
+    public List<int[]> getCandidateMoves(int column, int row) {
+        System.out.println("This pieces candidate moves haven't been coded");
+        return null;
+    }
 
 }

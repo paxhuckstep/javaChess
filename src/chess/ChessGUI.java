@@ -1,18 +1,17 @@
 package chess;
-
 import javax.swing.*;
 import java.awt.*;
+import java.util.Arrays;
 
 public class ChessGUI extends JPanel {
-    private JButton[][] boardSquares = new JButton[8][8];
+    private JButton[][] boardButtons = new JButton[8][8];
 
-    Piece[][] boardData = StartingBoardData.getStartingBoardData(true);
 
-    public ChessGUI() {
-//        setTitle("Chess");
+
+    public ChessGUI(Color lightSquareColor, Color darkSquareColor, boolean isWhitePov) {
         setSize(600, 600);
-//        setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(new GridLayout(8, 8));
+        Piece[][] boardData = StartingBoardData.getStartingBoardData(isWhitePov);
 
         for (int row = 0; row < 8; row++) {
             for (int column = 0; column < 8; column++) {
@@ -21,9 +20,9 @@ public class ChessGUI extends JPanel {
                 squareButton.setBorderPainted(false);
 
                 if ((row + column) % 2 == 0) {
-                    squareButton.setBackground(Color.WHITE);
+                    squareButton.setBackground(lightSquareColor);
                 } else {
-                    squareButton.setBackground(Color.GRAY);
+                    squareButton.setBackground(darkSquareColor);
                 }
 
                 if (boardData[row][column] != null) {
@@ -35,15 +34,24 @@ public class ChessGUI extends JPanel {
 
                 squareButton.addActionListener(e -> {
                     System.out.println("Clicked square: " + r + "," + c);
-                    Piece piece = boardData[r][c];
-                    if (piece != null) {
-                        System.out.println("This square has a " + piece.getClass().getSimpleName());
+                    Piece clickedPiece = boardData[r][c];
+                    if (clickedPiece != null) {
+                        System.out.println("This square has a " + clickedPiece.getClass().getSimpleName());
+                        System.out.println("This Piece says" + clickedPiece.getSay());
+
+
+                        for(int[] move : clickedPiece.getCandidateMoves(r,c)){
+                            System.out.println("A candidate move is: " + Arrays.toString(move));
+                        }
+
+
+
                     } else {
                         System.out.println("This square is empty.");
                     }
                 });
 
-                boardSquares[row][column] = squareButton;
+                boardButtons[row][column] = squareButton;
 
 
                 add(squareButton);

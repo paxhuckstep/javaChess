@@ -6,7 +6,7 @@ import java.awt.*;
 public class ChessGUI extends JFrame {
     private JButton[][] boardSquares = new JButton[8][8];
 
-    Piece[][] board = StartingBoardData.getStartingBoardData(true);
+    Piece[][] boardData = StartingBoardData.getStartingBoardData(true);
 
     public ChessGUI() {
         setTitle("Chess");
@@ -16,25 +16,37 @@ public class ChessGUI extends JFrame {
 
         for (int row = 0; row < 8; row++) {
             for (int column = 0; column < 8; column++) {
-                JButton square = new JButton();
-                square.setOpaque(true);
-                square.setBorderPainted(false);
+                JButton squareButton = new JButton();
+                squareButton.setOpaque(true);
+                squareButton.setBorderPainted(false);
 
                 if ((row + column) % 2 == 0) {
-                    square.setBackground(Color.WHITE);
+                    squareButton.setBackground(Color.WHITE);
                 } else {
-                    square.setBackground(Color.GRAY);
-                }
-//
-//                if (row == 0 && column == 3) {
-//                    square.setBackground(Color.PINK);
-//                }
-                if (board[row][column] != null) {
-                    square.setText(board[row][column].getClass().getSimpleName());
+                    squareButton.setBackground(Color.GRAY);
                 }
 
-                boardSquares[row][column] = square;
-                add(square);
+                if (boardData[row][column] != null) {
+                    squareButton.setText(boardData[row][column].getClass().getSimpleName());
+                }
+
+                int r = row;
+                int c = column;
+
+                squareButton.addActionListener(e -> {
+                    System.out.println("Clicked square: " + r + "," + c);
+                    Piece piece = boardData[r][c];
+                    if (piece != null) {
+                        System.out.println("This square has a " + piece.getClass().getSimpleName());
+                    } else {
+                        System.out.println("This square is empty.");
+                    }
+                });
+
+                boardSquares[row][column] = squareButton;
+
+
+                add(squareButton);
             }
         }
     }

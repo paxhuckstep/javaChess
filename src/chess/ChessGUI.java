@@ -3,6 +3,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.Arrays;
 
+
 public class ChessGUI extends JPanel {
     private JButton[][] boardButtons = new JButton[8][8];
 
@@ -40,7 +41,7 @@ public class ChessGUI extends JPanel {
                         System.out.println("This Piece says" + clickedPiece.getSay());
 
 
-                        for(int[] move : clickedPiece.getCandidateMoves(r,c)){
+                        for(int[] move : clickedPiece.getCandidateMoves(r,c)) {
                             System.out.println("A candidate move is: " + Arrays.toString(move));
                         }
 

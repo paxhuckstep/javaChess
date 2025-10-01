@@ -1,7 +1,44 @@
 package chess;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class King extends Piece {
+
     public King(boolean isWhite) {
-        super(isWhite);  // call Piece constructor
+        super(isWhite);
     }
+
+    @Override
+    public String getSay() {
+        return " King I am special boy";
+    }
+
+    @Override
+    public List<int[]> getCandidateMoves(int row, int column) {
+        System.out.println("This is a King and candidate moves are actively being coded");
+
+        List<int[]> candidateMoves = new ArrayList<>();
+
+        int[][] allDirections = {
+                {-1, -1}, {-1, 0}, {-1, 1},
+                {0, -1},           {0, 1},
+                {1, -1},  {1, 0},  {1, 1}
+        };
+
+        for (int[] direction : allDirections) {
+            int newRow = row + direction[0];
+            int newColumn = column + direction[1];
+
+            if (newRow >= 0 && newRow < 8 && newColumn >= 0 && newColumn < 8) {
+                candidateMoves.add(new int[]{newRow, newColumn});
+//                newRow +=direction[0];
+//                newColumn +=direction[1];
+            }
+
+        }
+        return candidateMoves;
+
+    }
+
 }

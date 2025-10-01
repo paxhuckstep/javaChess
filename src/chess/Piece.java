@@ -17,7 +17,7 @@ public abstract class Piece {
         return this.isWhite;
     }
 
-    public List<int[]> getCandidateMoves(int column, int row) {
+    public List<int[]> getCandidateMoves(int row, int column) {
         System.out.println("This pieces candidate moves haven't been coded");
         return null;
     }

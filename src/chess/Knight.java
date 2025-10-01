@@ -15,7 +15,7 @@ public class Knight extends Piece {
     }
 
     @Override
-    public List<int[]> getCandidateMoves(int column, int row) {
+    public List<int[]> getCandidateMoves(int row, int column) {
         System.out.println("This is a knight and candidate moves are actively being coded");
 
         List<int[]> candidateMoves = new ArrayList<>();

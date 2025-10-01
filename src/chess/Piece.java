@@ -13,6 +13,10 @@ public abstract class Piece {
         return " Something uncoded";
     }
 
+    public boolean getIsWhite () {
+        return this.isWhite;
+    }
+
     public List<int[]> getCandidateMoves(int column, int row) {
         System.out.println("This pieces candidate moves haven't been coded");
         return null;

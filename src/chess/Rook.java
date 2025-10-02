@@ -10,11 +10,6 @@ public class Rook extends Piece {
     }
 
     @Override
-    public String getSay() {
-        return " Rook I fuck shit";
-    }
-
-    @Override
     public List<int[]> getCandidateMoves(int row, int column) {
         System.out.println("This is a Rook and candidate moves are actively being coded");
 

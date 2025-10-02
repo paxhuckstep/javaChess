@@ -10,11 +10,6 @@ public class King extends Piece {
     }
 
     @Override
-    public String getSay() {
-        return " King I am special boy";
-    }
-
-    @Override
     public List<int[]> getCandidateMoves(int row, int column) {
         System.out.println("This is a King and candidate moves are actively being coded");
 
@@ -22,8 +17,8 @@ public class King extends Piece {
 
         int[][] allDirections = {
                 {-1, -1}, {-1, 0}, {-1, 1},
-                {0, -1},           {0, 1},
-                {1, -1},  {1, 0},  {1, 1}
+                {0, -1}, {0, 1},
+                {1, -1}, {1, 0}, {1, 1}
         };
 
         for (int[] direction : allDirections) {

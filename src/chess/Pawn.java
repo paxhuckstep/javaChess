@@ -10,11 +10,6 @@ public class Pawn extends Piece {
     }
 
     @Override
-    public String getSay() {
-        return " Pawn I am autistic";
-    }
-
-    @Override
     public List<int[]> getCandidateMoves(int row, int column) {
         System.out.println("This is a Pawn and candidate moves are actively being coded");
 

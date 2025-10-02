@@ -10,11 +10,6 @@ public class Bishop extends Piece {
     }
 
     @Override
-    public String getSay() {
-        return " Bishop I pray bloody jesus";
-    }
-
-    @Override
     public List<int[]> getCandidateMoves(int row, int column) {
         System.out.println("This is a bishop and candidate moves are actively being coded");
 

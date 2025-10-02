@@ -10,11 +10,6 @@ public class Knight extends Piece {
     }
 
     @Override
-    public String getSay() {
-        return " Neigh I jump like L";
-    }
-
-    @Override
     public List<int[]> getCandidateMoves(int row, int column) {
         System.out.println("This is a knight and candidate moves are actively being coded");
 

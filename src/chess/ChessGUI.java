@@ -1,4 +1,5 @@
 package chess;
+
 import javax.swing.*;
 import java.awt.*;
 import java.util.Arrays;
@@ -6,7 +7,6 @@ import java.util.Arrays;
 
 public class ChessGUI extends JPanel {
     private JButton[][] boardButtons = new JButton[8][8];
-
 
 
     public ChessGUI(Color lightSquareColor, Color darkSquareColor, boolean isWhitePov) {
@@ -38,13 +38,13 @@ public class ChessGUI extends JPanel {
                     Piece clickedPiece = boardData[r][c];
                     if (clickedPiece != null) {
                         System.out.println("This square has a " + clickedPiece.getClass().getSimpleName());
-                        System.out.println("This Piece says" + clickedPiece.getSay());
 
 
-                        for(int[] move : clickedPiece.getCandidateMoves(r,c)) {
+                        for (int[] move : clickedPiece.getCandidateMoves(r, c)) {
                             System.out.println("A candidate move is: " + Arrays.toString(move));
                         }
 
+                        for ()
 
 
                     } else {

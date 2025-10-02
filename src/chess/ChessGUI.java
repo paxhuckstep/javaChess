@@ -26,33 +26,31 @@ public class ChessGUI extends JPanel {
                     squareButton.setBackground(darkSquareColor);
                 }
 
-                if (boardData[row][column] != null) {
-                    squareButton.setText(boardData[row][column].getClass().getSimpleName());
+                if (boardData[column][row] != null) {
+                    squareButton.setText(boardData[column][row].getClass().getSimpleName());
                 }
 
-                int r = row;
+
                 int c = column;
+                int r = row;
 
                 squareButton.addActionListener(e -> {
-                    System.out.println("Clicked square: " + r + "," + c);
-                    Piece clickedPiece = boardData[r][c];
+                    System.out.println("Clicked square: " + c + "," + r);
+                    Piece clickedPiece = boardData[c][r];
                     if (clickedPiece != null) {
                         System.out.println("This square has a " + clickedPiece.getClass().getSimpleName());
 
 
-                        for (int[] move : clickedPiece.getCandidateMoves(r, c)) {
+                        for (int[] move : clickedPiece.getCandidateMoves(c, r)) {
                             System.out.println("A candidate move is: " + Arrays.toString(move));
                         }
-
-                        for ()
-
 
                     } else {
                         System.out.println("This square is empty.");
                     }
                 });
 
-                boardButtons[row][column] = squareButton;
+                boardButtons[column][row] = squareButton;
 
 
                 add(squareButton);

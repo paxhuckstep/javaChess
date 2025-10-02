@@ -10,7 +10,7 @@ public class King extends Piece {
     }
 
     @Override
-    public List<int[]> getCandidateMoves(int row, int column) {
+    public List<int[]> getCandidateMoves(int column, int row) {
         System.out.println("This is a King and candidate moves are actively being coded");
 
         List<int[]> candidateMoves = new ArrayList<>();
@@ -26,7 +26,7 @@ public class King extends Piece {
             int newColumn = column + direction[1];
 
             if (newRow >= 0 && newRow < 8 && newColumn >= 0 && newColumn < 8) {
-                candidateMoves.add(new int[]{newRow, newColumn});
+                candidateMoves.add(new int[]{newColumn, newRow});
 //                newRow +=direction[0];
 //                newColumn +=direction[1];
             }

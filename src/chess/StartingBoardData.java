@@ -5,27 +5,27 @@ public class StartingBoardData {
 
     public static Piece[][] getStartingBoardData(boolean isWhitePov) {
         startingBoardData[0][0] = new Rook(!isWhitePov);
-        startingBoardData[0][7] = new Rook(!isWhitePov);
-        startingBoardData[0][1] = new Knight(!isWhitePov);
-        startingBoardData[0][6] = new Knight(!isWhitePov);
-        startingBoardData[0][2] = new Bishop(!isWhitePov);
-        startingBoardData[0][5] = new Bishop(!isWhitePov);
-        startingBoardData[0][3] = new Queen(!isWhitePov);
-        startingBoardData[0][4] = new King(!isWhitePov);
+        startingBoardData[7][0] = new Rook(!isWhitePov);
+        startingBoardData[1][0] = new Knight(!isWhitePov);
+        startingBoardData[6][0] = new Knight(!isWhitePov);
+        startingBoardData[2][0] = new Bishop(!isWhitePov);
+        startingBoardData[5][0] = new Bishop(!isWhitePov);
+        startingBoardData[3][0] = new Queen(!isWhitePov);
+        startingBoardData[4][0] = new King(!isWhitePov);
 
         for (int i = 0; i < 8; i++) {
-            startingBoardData[1][i] = new Pawn(!isWhitePov);
-            startingBoardData[6][i] = new Pawn(isWhitePov);
+            startingBoardData[i][1] = new Pawn(!isWhitePov);
+            startingBoardData[i][6] = new Pawn(isWhitePov);
         }
 
-        startingBoardData[7][0] = new Rook(isWhitePov);
+        startingBoardData[0][7] = new Rook(isWhitePov);
         startingBoardData[7][7] = new Rook(isWhitePov);
-        startingBoardData[7][1] = new Knight(isWhitePov);
-        startingBoardData[7][6] = new Knight(isWhitePov);
-        startingBoardData[7][2] = new Bishop(isWhitePov);
-        startingBoardData[7][5] = new Bishop(isWhitePov);
-        startingBoardData[7][3] = new Queen(isWhitePov);
-        startingBoardData[7][4] = new King(isWhitePov);
+        startingBoardData[1][7] = new Knight(isWhitePov);
+        startingBoardData[6][7] = new Knight(isWhitePov);
+        startingBoardData[2][7] = new Bishop(isWhitePov);
+        startingBoardData[5][7] = new Bishop(isWhitePov);
+        startingBoardData[3][7] = new Queen(isWhitePov);
+        startingBoardData[4][7] = new King(isWhitePov);
 
 
         return startingBoardData;

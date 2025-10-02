@@ -2,7 +2,9 @@ package chess;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 
 public class ChessGUI extends JPanel {
@@ -40,9 +42,17 @@ public class ChessGUI extends JPanel {
                     if (clickedPiece != null) {
                         System.out.println("This square has a " + clickedPiece.getClass().getSimpleName());
 
+                        List<int[]> candidateMoves = clickedPiece.getCandidateMoves(c, r);
 
-                        for (int[] move : clickedPiece.getCandidateMoves(c, r)) {
+
+                        for (int[] move : candidateMoves) {
                             System.out.println("A candidate move is: " + Arrays.toString(move));
+                        }
+
+                        List<int[]> simpleObstaclesHandled = clickedPiece.handleObstacles(c, r, boardData, candidateMoves);
+
+                        for (int[] move : simpleObstaclesHandled) {
+                            System.out.println("A more realistic move is: " + Arrays.toString(move));
                         }
 
                     } else {

@@ -59,7 +59,12 @@ public abstract class Piece {
                 }
             }
             if (!isBlocked) {
-                noObstacles.add(possibleMove);
+                Piece maybeCapture = boardData[possibleMove[0]][possibleMove[1]];
+                if (maybeCapture == null || maybeCapture.getIsWhite() != this.getIsWhite()) {
+                    noObstacles.add(possibleMove);
+                }
+
+
             }
         }
 

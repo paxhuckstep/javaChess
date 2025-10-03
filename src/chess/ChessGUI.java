@@ -11,7 +11,7 @@ public class ChessGUI extends JPanel {
     private ChessSquareButton[][] boardButtons = new ChessSquareButton[8][8];
 
     private static Piece lastClickedPiece = null;
-
+    public static int[] lastClickedSquare = new int[2];
 
     public ChessGUI(Color lightSquareColor, Color darkSquareColor, boolean isWhitePov) {
         setSize(600, 600);
@@ -46,6 +46,12 @@ public class ChessGUI extends JPanel {
                         //move piece
                         System.out.println("Move " + lastClickedPiece.getClass().getSimpleName() + " to " + c + ", " + r);
 
+                        boardData[lastClickedSquare[0]][lastClickedSquare[1]] = null;
+                        boardData[c][r] = lastClickedPiece;
+
+                        // repaint
+                        refreshBoard(boardData);
+
                     } else {
 
                         for (ChessSquareButton[] cleanRow : boardButtons) {
@@ -55,6 +61,7 @@ public class ChessGUI extends JPanel {
                         }
 
                         lastClickedPiece = clickedPiece;
+                        lastClickedSquare = new int[]{c, r};
 
                         if (clickedPiece != null) {
 
@@ -84,5 +91,27 @@ public class ChessGUI extends JPanel {
                 add(squareButton);
             }
         }
+
+
+    }
+
+    public void refreshBoard(Piece[][] boardData) {
+        for (int row = 0; row < 8; row++) {
+            for (int column = 0; column < 8; column++) {
+                ChessSquareButton square = boardButtons[column][row];
+                Piece piece = boardData[column][row];
+
+                if (piece != null) {
+                    square.setText(piece.getClass().getSimpleName());
+                } else {
+                    square.setText("");
+                }
+
+                square.setShowCircle(false); // clear indicators on refresh
+            }
+        }
+
+        revalidate();
+        repaint();
     }
 }

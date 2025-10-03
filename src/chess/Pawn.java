@@ -11,7 +11,7 @@ public class Pawn extends Piece {
 
     @Override
     public List<int[]> getCandidateMoves(int column, int row) {
-//        System.out.println("This is a Pawn and candidate moves are actively being coded");
+//        System.out.println("This is a Pawn and candidate possibleMoves are actively being coded");
 
         List<int[]> candidateMoves = new ArrayList<>();
 
@@ -23,7 +23,7 @@ public class Pawn extends Piece {
 //            System.out.println("It's going up?");
 //        }
 
-        // one move forward
+        // one possibleMove forward
         int inFront = row + upOrDown;
         if (inFront >= 0 && inFront < 8) {
             candidateMoves.add(new int[]{column, inFront});
@@ -45,6 +45,37 @@ public class Pawn extends Piece {
             }
         }
         return candidateMoves;
+    }
+
+    @Override
+    public List<int[]> handleObstacles(int column, int row, Piece[][] boardData, List<int[]> candidateMoves) {
+        List<int[]> noObstacles = new ArrayList<>();
+
+        for (int[] possibleMove : candidateMoves) {
+            int newColumn = possibleMove[0];
+            int newRow = possibleMove[1];
+            Piece target = boardData[newColumn][newRow];
+
+            // Forward possibleMoves: must be empty
+            if (newColumn == column) {
+                if (target == null) {
+                    // double jump: check both squares are clear
+                    if (Math.abs(newRow - row) == 2) {
+                        int midRow = (row + newRow) / 2;
+                        if (boardData[newColumn][midRow] == null) {
+                            noObstacles.add(possibleMove);
+                        }
+                    } else {
+                        noObstacles.add(possibleMove);
+                    }
+                }
+            }
+            // Diagonal captures: must be enemy piece
+            else if (target != null && target.getIsWhite() != this.getIsWhite()) {
+                noObstacles.add(possibleMove);
+            }
+        }
+        return noObstacles;
     }
 
 }

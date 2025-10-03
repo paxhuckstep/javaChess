@@ -15,7 +15,7 @@ public class BigGUI extends JFrame {
         setLayout(new BorderLayout());
 
         // Create chessboard
-        chessBoard = new ChessGUI(Color.WHITE, Color.lightGray, true);
+        chessBoard = new ChessGUI(Color.WHITE, Color.lightGray, false);
 
         // Create buttons
         JButton resetButton = new JButton("Reset");

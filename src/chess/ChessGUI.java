@@ -30,56 +30,45 @@ public class ChessGUI extends JPanel {
                     squareButton.setBackground(darkSquareColor);
                 }
 
-                if (boardData[column][row] != null) {
-                    squareButton.setText(boardData[column][row].getClass().getSimpleName());
-                }
+                Piece piece = boardData[column][row];
+                updateSquareIcon(squareButton, piece);
 
 
                 int c = column;
                 int r = row;
-
                 squareButton.addActionListener(e -> {
 //                    System.out.println("Clicked square: " + c + "," + r);
                     Piece clickedPiece = boardData[c][r];
-
                     if (boardButtons[c][r].getIsLegal()) {
                         //move piece
                         System.out.println("Move " + lastClickedPiece.getClass().getSimpleName() + " to " + c + ", " + r);
-
                         boardData[lastClickedSquare[0]][lastClickedSquare[1]] = null;
                         boardData[c][r] = lastClickedPiece;
-
                         // repaint
                         refreshBoard(boardData);
 
                     } else {
-
                         for (ChessSquareButton[] cleanRow : boardButtons) {
                             for (ChessSquareButton button : cleanRow) {
                                 button.setShowCircle(false);
                             }
                         }
-
-                        lastClickedPiece = clickedPiece;
-                        lastClickedSquare = new int[]{c, r};
-
                         if (clickedPiece != null) {
 
                             List<int[]> candidateMoves = clickedPiece.getCandidateMoves(c, r);
-
-//                            for (int[] move : candidateMoves) {
-//                                System.out.println("A candidate move is: " + Arrays.toString(move));
-//                            }
-
                             List<int[]> simpleObstaclesHandled = clickedPiece.handleObstacles(c, r, boardData, candidateMoves);
-
-
+                            // handleIsPinnedToKing
+                            // handleIsCheck
                             for (int[] move : simpleObstaclesHandled) {
 //                                System.out.println("A more realistic move is: " + Arrays.toString(move));
                                 boardButtons[move[0]][move[1]].setShowCircle(true);
                             }
-
+//                            for (int[] move : candidateMoves) {
+//                                System.out.println("A candidate move is: " + Arrays.toString(move));
+//                            }
                         }
+                        lastClickedPiece = clickedPiece;
+                        lastClickedSquare = new int[]{c, r};
                     }
 
 
@@ -100,18 +89,24 @@ public class ChessGUI extends JPanel {
             for (int column = 0; column < 8; column++) {
                 ChessSquareButton square = boardButtons[column][row];
                 Piece piece = boardData[column][row];
-
-                if (piece != null) {
-                    square.setText(piece.getClass().getSimpleName());
-                } else {
-                    square.setText("");
-                }
-
-                square.setShowCircle(false); // clear indicators on refresh
+                updateSquareIcon(square, piece);
+                square.setShowCircle(false);
             }
         }
-
         revalidate();
         repaint();
     }
+
+    private void updateSquareIcon(ChessSquareButton square, Piece piece) {
+        if (piece != null) {
+            String color = piece.getIsWhite() ? "white" : "black";
+            String name = piece.getClass().getSimpleName().toLowerCase();
+            ImageIcon rawIcon = new ImageIcon(getClass().getResource("/chess/images/" + color + "_" + name + ".png"));
+            Image scaled = rawIcon.getImage().getScaledInstance(60, 60, Image.SCALE_SMOOTH);
+            square.setIcon(new ImageIcon(scaled));
+        } else {
+            square.setIcon(null);
+        }
+    }
+
 }

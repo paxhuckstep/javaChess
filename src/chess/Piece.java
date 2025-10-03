@@ -96,56 +96,84 @@ public abstract class Piece {
         int rowGap = myKingRow - row;
         boolean aligned = (columnGap == 0 || rowGap == 0 || Math.abs(columnGap) == Math.abs(rowGap));
         if (!aligned) {
-            System.out.println("Not even aligned!");
             return noObstacles; // not pinned
         }
 
-        // Step 3: scan past the king
-        int columnStep = Integer.compare(0, columnGap); // 1, 0, or -1
-        int rowStep = Integer.compare(0, rowGap); // 1, 0, or -1
+        // Step 3: scan from piece
+        int columnDirection = Integer.compare(0, columnGap); // 1, 0, or -1
+        int rowDirection = Integer.compare(0, rowGap); // 1, 0, or -1
 
-        int scanColumn = column + columnStep;
-        int scanRow = row + rowStep;
+        int scanColumn = column + columnDirection;
+        int scanRow = row + rowDirection;
 
-        boolean pinFound = false;
+        boolean kingClosest = false;
+        boolean pinnerClosest = false;
+
         while (scanColumn >= 0 && scanColumn < 8 && scanRow >= 0 && scanRow < 8) {
             Piece potentialPinner = boardData[scanColumn][scanRow];
             if (potentialPinner != null) {
                 if (potentialPinner.getIsWhite() != this.getIsWhite()) {
-                    if ((columnStep == 0 || rowStep == 0) && (potentialPinner instanceof Rook || potentialPinner instanceof Queen)) {
-                        pinFound = true;
-                        System.out.println("Rooky Pin Found");
+                    if ((columnDirection == 0 || rowDirection == 0) && (potentialPinner instanceof Rook || potentialPinner instanceof Queen)) {
+                        pinnerClosest = true;
+//                        System.out.println("Rooky Pin Possible");
                     }
-                    if (Math.abs(columnStep) == 1 && Math.abs(rowStep) == 1 && (potentialPinner instanceof Bishop || potentialPinner instanceof Queen)) {
-                        pinFound = true;
-                        System.out.println("Bishopy Pin Found");
+                    if (Math.abs(columnDirection) == 1 && Math.abs(rowDirection) == 1 && (potentialPinner instanceof Bishop || potentialPinner instanceof Queen)) {
+                        pinnerClosest = true;
+//                        System.out.println("Bishopy Pin possible");
                     }
                 }
                 break;
             }
-            scanColumn += columnStep;
-            scanRow += rowStep;
+            scanColumn += columnDirection;
+            scanRow += rowDirection;
         }
 
-        // Step 4: filter legal moves
-        if (pinFound) {
-            for (int[] move : noObstacles) {
-                int newColumn = move[0];
-                int newRow = move[1];
-                int moveColumnDiff = newColumn - myKingColumn;
-                int moveRowDiff = newRow - myKingRow;
+        scanColumn = column - columnDirection;
+        scanRow = row - rowDirection;
 
-                if ((columnGap == 0 && newColumn == myKingColumn) ||
-                        (rowGap == 0 && newRow == myKingRow) ||
-                        (Math.abs(moveColumnDiff) == Math.abs(moveRowDiff))) {
-                    pinHandledMoves.add(move);
+        while (scanColumn >= 0 && scanColumn < 8 && scanRow >= 0 && scanRow < 8) {
+            Piece maybeKing = boardData[scanColumn][scanRow];
+            if (maybeKing != null) {
+                if (maybeKing.getIsWhite() == this.getIsWhite() && maybeKing instanceof King) {
+                    kingClosest = true;
+//                        System.out.println("King Pin possible");
                 }
+                break;
+            }
+            scanColumn -= columnDirection;
+            scanRow -= rowDirection;
+        }
+
+        // Step 4: filter legal moves (only along the actual pin line)
+        if (kingClosest && pinnerClosest) {
+            for (int[] move : noObstacles) {
+                int newColumn = move[0], newRow = move[1];
+                int moveColumnGap = newColumn - myKingColumn;
+                int moveRowGap = newRow - myKingRow;
+
+                boolean allowed = false;
+
+                if (columnDirection == 0 && rowDirection != 0) {
+                    // vertical pin
+                    allowed = (newColumn == myKingColumn);
+                } else if (rowDirection == 0 && columnDirection != 0) {
+                    // horizontal pin
+                    allowed = (newRow == myKingRow);
+                } else {
+                    // diagonal pin
+                    if (Math.abs(columnGap) == Math.abs(rowGap) &&
+                            Math.abs(moveColumnGap) == Math.abs(moveRowGap)) {
+                        int moveColumnDirection = Integer.compare(moveColumnGap, 0);
+                        int moveStepDirection = Integer.compare(moveRowGap, 0);
+                        // either direction along the same diagonal
+                        allowed = ((moveColumnDirection == columnDirection && moveStepDirection == rowDirection) ||
+                                (moveColumnDirection == -columnDirection && moveStepDirection == -rowDirection));
+                    }
+                }
+                if (allowed) pinHandledMoves.add(move);
             }
             return pinHandledMoves;
         }
-
         return noObstacles;
     }
-
-
 }

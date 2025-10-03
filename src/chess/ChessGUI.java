@@ -8,7 +8,9 @@ import java.util.List;
 
 
 public class ChessGUI extends JPanel {
-    private JButton[][] boardButtons = new JButton[8][8];
+    private ChessSquareButton[][] boardButtons = new ChessSquareButton[8][8];
+
+    private static Piece lastClickedPiece = null;
 
 
     public ChessGUI(Color lightSquareColor, Color darkSquareColor, boolean isWhitePov) {
@@ -18,7 +20,7 @@ public class ChessGUI extends JPanel {
 
         for (int row = 0; row < 8; row++) {
             for (int column = 0; column < 8; column++) {
-                JButton squareButton = new JButton();
+                ChessSquareButton squareButton = new ChessSquareButton();
                 squareButton.setOpaque(true);
                 squareButton.setBorderPainted(false);
 
@@ -37,27 +39,43 @@ public class ChessGUI extends JPanel {
                 int r = row;
 
                 squareButton.addActionListener(e -> {
-                    System.out.println("Clicked square: " + c + "," + r);
+//                    System.out.println("Clicked square: " + c + "," + r);
                     Piece clickedPiece = boardData[c][r];
-                    if (clickedPiece != null) {
-                        System.out.println("This square has a " + clickedPiece.getClass().getSimpleName());
 
-                        List<int[]> candidateMoves = clickedPiece.getCandidateMoves(c, r);
-
-
-                        for (int[] move : candidateMoves) {
-                            System.out.println("A candidate move is: " + Arrays.toString(move));
-                        }
-
-                        List<int[]> simpleObstaclesHandled = clickedPiece.handleObstacles(c, r, boardData, candidateMoves);
-
-                        for (int[] move : simpleObstaclesHandled) {
-                            System.out.println("A more realistic move is: " + Arrays.toString(move));
-                        }
+                    if (boardButtons[c][r].getIsLegal()) {
+                        //move piece
+                        System.out.println("Move " + lastClickedPiece.getClass().getSimpleName() + " to " + c + ", " + r);
 
                     } else {
-                        System.out.println("This square is empty.");
+
+                        for (ChessSquareButton[] cleanRow : boardButtons) {
+                            for (ChessSquareButton button : cleanRow) {
+                                button.setShowCircle(false);
+                            }
+                        }
+
+                        lastClickedPiece = clickedPiece;
+
+                        if (clickedPiece != null) {
+
+                            List<int[]> candidateMoves = clickedPiece.getCandidateMoves(c, r);
+
+//                            for (int[] move : candidateMoves) {
+//                                System.out.println("A candidate move is: " + Arrays.toString(move));
+//                            }
+
+                            List<int[]> simpleObstaclesHandled = clickedPiece.handleObstacles(c, r, boardData, candidateMoves);
+
+
+                            for (int[] move : simpleObstaclesHandled) {
+//                                System.out.println("A more realistic move is: " + Arrays.toString(move));
+                                boardButtons[move[0]][move[1]].setShowCircle(true);
+                            }
+
+                        }
                     }
+
+
                 });
 
                 boardButtons[column][row] = squareButton;

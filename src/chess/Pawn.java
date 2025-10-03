@@ -11,16 +11,16 @@ public class Pawn extends Piece {
 
     @Override
     public List<int[]> getCandidateMoves(int column, int row) {
-        System.out.println("This is a Pawn and candidate moves are actively being coded");
+//        System.out.println("This is a Pawn and candidate moves are actively being coded");
 
         List<int[]> candidateMoves = new ArrayList<>();
 
         int upOrDown = getIsWhite() ? -1 : 1;
-        if(upOrDown == 1) {
-            System.out.println("It's going down??");
-        } else {
-            System.out.println("It's going up?");
-        }
+//        if(upOrDown == 1) {
+//            System.out.println("It's going down??");
+//        } else {
+//            System.out.println("It's going up?");
+//        }
 
         // one move forward
         int inFront = row + upOrDown;

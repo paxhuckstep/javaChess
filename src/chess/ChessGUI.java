@@ -57,10 +57,11 @@ public class ChessGUI extends JPanel {
                         Piece clickedPiece = boardData[c][r];
                         if (clickedPiece != null) {
                             List<int[]> candidateMoves = clickedPiece.getCandidateMoves(c, r);
-                            List<int[]> simpleObstaclesHandled = clickedPiece.handleObstacles(c, r, boardData, candidateMoves);
+                            List<int[]> obstaclesHandled = clickedPiece.handleObstacles(c, r, boardData, candidateMoves);
                             // handleIsPinnedToKing
+                            List<int[]> isPinnedMoves = clickedPiece.handleIsPinnedToKing(c,r,boardData, obstaclesHandled);
                             // handleBlocksCheck
-                            for (int[] move : simpleObstaclesHandled) {
+                            for (int[] move : isPinnedMoves) {
 //                                System.out.println("A more realistic move is: " + Arrays.toString(move));
                                 boardButtons[move[0]][move[1]].setIsLegal(true);
                             }

@@ -36,4 +36,10 @@ public class King extends Piece {
 
     }
 
+    @Override
+    public List<int[]> handleIsPinnedToKing(int column, int row, Piece[][] boardData, List<int[]> noObstacles) {
+        return noObstacles;
+    }
+
+
 }

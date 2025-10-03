@@ -8,21 +8,21 @@ import java.awt.Graphics2D;
 
 
 class ChessSquareButton extends JButton {
-    private boolean showCircle = false;
+    private boolean isLegal = false;
 
-    public void setShowCircle(boolean show) {
-        this.showCircle = show;
+    public void setIsLegal(boolean isLegal) {
+        this.isLegal = isLegal;
         repaint();
     }
 
     public boolean getIsLegal() {
-        return this.showCircle;
+        return this.isLegal;
     }
 
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        if (showCircle) {
+        if (isLegal) {
             Graphics2D g2d = (Graphics2D) g.create();
             g2d.setColor(new Color(165, 42, 42, 128)); // red with 50% transparency
             int diameter = Math.min(getWidth(), getHeight()) / 3;

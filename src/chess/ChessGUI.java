@@ -9,11 +9,12 @@ import java.util.List;
 
 public class ChessGUI extends JPanel {
     private ChessSquareButton[][] boardButtons = new ChessSquareButton[8][8];
-
+    public static boolean isWhitePovGlobal;
     private static Piece lastClickedPiece = null;
     public static int[] lastClickedSquare = new int[2];
 
     public ChessGUI(Color lightSquareColor, Color darkSquareColor, boolean isWhitePov) {
+        ChessGUI.isWhitePovGlobal = isWhitePov;
         setSize(600, 600);
         setLayout(new GridLayout(8, 8));
         Piece[][] boardData = StartingBoardData.getStartingBoardData(isWhitePov);
@@ -30,18 +31,18 @@ public class ChessGUI extends JPanel {
                     squareButton.setBackground(darkSquareColor);
                 }
 
-                Piece piece = boardData[column][row];
-                updateSquareIcon(squareButton, piece);
+//                Piece piece = boardData[column][row]; THESE I TOOK OUT
+//                updateSquareIcon(squareButton, piece);
 
 
                 int c = column;
                 int r = row;
                 squareButton.addActionListener(e -> {
 //                    System.out.println("Clicked square: " + c + "," + r);
-                    Piece clickedPiece = boardData[c][r];
+//                    Piece clickedPiece = boardData[c][r];
                     if (boardButtons[c][r].getIsLegal()) {
                         //move piece
-                        System.out.println("Move " + lastClickedPiece.getClass().getSimpleName() + " to " + c + ", " + r);
+//                        System.out.println("Move " + lastClickedPiece.getClass().getSimpleName() + " to " + c + ", " + r);
                         boardData[lastClickedSquare[0]][lastClickedSquare[1]] = null;
                         boardData[c][r] = lastClickedPiece;
                         // repaint
@@ -50,18 +51,18 @@ public class ChessGUI extends JPanel {
                     } else {
                         for (ChessSquareButton[] cleanRow : boardButtons) {
                             for (ChessSquareButton button : cleanRow) {
-                                button.setShowCircle(false);
+                                button.setIsLegal(false);
                             }
                         }
+                        Piece clickedPiece = boardData[c][r];
                         if (clickedPiece != null) {
-
                             List<int[]> candidateMoves = clickedPiece.getCandidateMoves(c, r);
                             List<int[]> simpleObstaclesHandled = clickedPiece.handleObstacles(c, r, boardData, candidateMoves);
                             // handleIsPinnedToKing
                             // handleIsCheck
                             for (int[] move : simpleObstaclesHandled) {
 //                                System.out.println("A more realistic move is: " + Arrays.toString(move));
-                                boardButtons[move[0]][move[1]].setShowCircle(true);
+                                boardButtons[move[0]][move[1]].setIsLegal(true);
                             }
 //                            for (int[] move : candidateMoves) {
 //                                System.out.println("A candidate move is: " + Arrays.toString(move));
@@ -70,18 +71,12 @@ public class ChessGUI extends JPanel {
                         lastClickedPiece = clickedPiece;
                         lastClickedSquare = new int[]{c, r};
                     }
-
-
                 });
-
                 boardButtons[column][row] = squareButton;
-
-
                 add(squareButton);
             }
         }
-
-
+        refreshBoard(boardData);
     }
 
     public void refreshBoard(Piece[][] boardData) {
@@ -90,7 +85,7 @@ public class ChessGUI extends JPanel {
                 ChessSquareButton square = boardButtons[column][row];
                 Piece piece = boardData[column][row];
                 updateSquareIcon(square, piece);
-                square.setShowCircle(false);
+                square.setIsLegal(false);
             }
         }
         revalidate();
@@ -108,5 +103,9 @@ public class ChessGUI extends JPanel {
             square.setIcon(null);
         }
     }
+
+//    public boolean getIsWhitePov() {
+//        return isWhitePov;
+//    }
 
 }

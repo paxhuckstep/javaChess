@@ -15,7 +15,8 @@ public class Pawn extends Piece {
 
         List<int[]> candidateMoves = new ArrayList<>();
 
-        int upOrDown = getIsWhite() ? -1 : 1;
+        int upOrDown = (getIsWhite() == ChessGUI.isWhitePovGlobal) ? -1 : 1;
+
 //        if(upOrDown == 1) {
 //            System.out.println("It's going down??");
 //        } else {
@@ -28,10 +29,13 @@ public class Pawn extends Piece {
             candidateMoves.add(new int[]{column, inFront});
 
             // double jumps
-            if ((getIsWhite() && row == 6) || (!getIsWhite() && row == 1)) {
+            int startingRow = (getIsWhite() == ChessGUI.isWhitePovGlobal) ? 6 : 1;
+
+            if (row == startingRow) {
                 int doubleInFront = row + (2 * upOrDown);
                 candidateMoves.add(new int[]{column, doubleInFront});
             }
+
             // possible captures
             int[] eitherSide = {column - 1, column + 1};
             for (int side : eitherSide) {
@@ -39,10 +43,8 @@ public class Pawn extends Piece {
                     candidateMoves.add(new int[]{side, inFront});
                 }
             }
-
         }
         return candidateMoves;
-
     }
 
 }

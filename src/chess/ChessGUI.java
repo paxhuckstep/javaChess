@@ -48,9 +48,11 @@ public class ChessGUI extends JPanel {
 //                    System.out.println("Clicked square: " + c + "," + r);
 //                    Piece clickedPiece = boardData[c][r];
                     if (boardButtons[c][r].getIsLegal()) {
+
                         //move piece
                         boardData[lastClickedSquare[0]][lastClickedSquare[1]] = null;
                         boardData[c][r] = lastClickedPiece;
+
                         //Castling Rights Check
                         if (lastClickedPiece instanceof King) {
                             if (lastClickedSquare[1] == 0) {
@@ -69,15 +71,9 @@ public class ChessGUI extends JPanel {
                             }
                         }
 
-
-
-
-
-
                         // Handle castling rook movement
                         if (lastClickedPiece instanceof King) {
                             int previousRow = lastClickedSquare[1];
-
                             // Bottom side castling
                             if (previousRow == 7) {
                                 if (isWhitePovGlobal) { // White POV (king starts col 4)
@@ -128,9 +124,6 @@ public class ChessGUI extends JPanel {
                                 }
                             }
                         }
-
-
-
 
                         // repaint
                         refreshBoard(boardData);

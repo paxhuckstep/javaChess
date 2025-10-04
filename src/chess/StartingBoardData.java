@@ -10,8 +10,7 @@ public class StartingBoardData {
         startingBoardData[6][0] = new Knight(!isWhitePov);
         startingBoardData[2][0] = new Bishop(!isWhitePov);
         startingBoardData[5][0] = new Bishop(!isWhitePov);
-        startingBoardData[3][0] = new Queen(!isWhitePov);
-        startingBoardData[4][0] = new King(!isWhitePov);
+
 
         for (int i = 0; i < 8; i++) {
             startingBoardData[i][1] = new Pawn(!isWhitePov);
@@ -24,8 +23,11 @@ public class StartingBoardData {
         startingBoardData[6][7] = new Knight(isWhitePov);
         startingBoardData[2][7] = new Bishop(isWhitePov);
         startingBoardData[5][7] = new Bishop(isWhitePov);
-        startingBoardData[3][7] = new Queen(isWhitePov);
-        startingBoardData[4][7] = new King(isWhitePov);
+
+        startingBoardData[3][0] = isWhitePov ? new Queen(false) : new King(true);
+        startingBoardData[4][0] = isWhitePov ? new King(false) : new Queen(true);
+        startingBoardData[3][7] = isWhitePov ? new Queen(true) : new King(false);
+        startingBoardData[4][7] = isWhitePov ? new King(true) : new Queen(false);
 
 
         return startingBoardData;

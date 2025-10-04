@@ -13,6 +13,13 @@ public class ChessGUI extends JPanel {
     private static Piece lastClickedPiece = null;
     public static int[] lastClickedSquare = new int[2];
 
+    public static boolean topLeftRookMoved = false;
+    public static boolean topRightRookMoved = false;
+    public static boolean bottomLeftRookMoved = false;
+    public static boolean bottomRightRookMoved = false;
+    public static boolean topKingMoved = false;
+    public static boolean bottomKingMoved = false;
+
     public ChessGUI(Color lightSquareColor, Color darkSquareColor, boolean isWhitePov) {
         ChessGUI.isWhitePovGlobal = isWhitePov;
         setSize(600, 600);
@@ -42,9 +49,89 @@ public class ChessGUI extends JPanel {
 //                    Piece clickedPiece = boardData[c][r];
                     if (boardButtons[c][r].getIsLegal()) {
                         //move piece
-//                        System.out.println("Move " + lastClickedPiece.getClass().getSimpleName() + " to " + c + ", " + r);
                         boardData[lastClickedSquare[0]][lastClickedSquare[1]] = null;
                         boardData[c][r] = lastClickedPiece;
+                        //Castling Rights Check
+                        if (lastClickedPiece instanceof King) {
+                            if (lastClickedSquare[1] == 0) {
+                                topKingMoved = true;
+                            } else if (lastClickedSquare[1] == 7) {
+                                bottomKingMoved = true;
+                            }
+                        }
+                        else if (lastClickedPiece instanceof Rook) {
+                            if (lastClickedSquare[1] == 0) { // top row
+                                if (lastClickedSquare[0] == 0) topLeftRookMoved = true;
+                                if (lastClickedSquare[0] == 7) topRightRookMoved = true;
+                            } else if (lastClickedSquare[1] == 7) { // bottom row
+                                if (lastClickedSquare[0] == 0) bottomLeftRookMoved = true;
+                                if (lastClickedSquare[0] == 7) bottomRightRookMoved = true;
+                            }
+                        }
+
+
+
+
+
+
+                        // Handle castling rook movement
+                        if (lastClickedPiece instanceof King) {
+                            int previousRow = lastClickedSquare[1];
+
+                            // Bottom side castling
+                            if (previousRow == 7) {
+                                if (isWhitePovGlobal) { // White POV (king starts col 4)
+                                    if (c == 6) { // short castle
+                                        boardData[5][7] = boardData[7][7]; // move rook
+                                        boardData[7][7] = null;
+                                        bottomRightRookMoved = true;
+                                    } else if (c == 2) { // long castle
+                                        boardData[3][7] = boardData[0][7];
+                                        boardData[0][7] = null;
+                                        bottomLeftRookMoved = true;
+                                    }
+                                } else { // Black POV (king starts col 3)
+                                    if (c == 1) { // short castle
+                                        boardData[2][7] = boardData[0][7];
+                                        boardData[0][7] = null;
+                                        bottomLeftRookMoved = true;
+                                    } else if (c == 5) { // long castle
+                                        boardData[4][7] = boardData[7][7];
+                                        boardData[7][7] = null;
+                                        bottomRightRookMoved = true;
+                                    }
+                                }
+                            }
+
+                            // Top side castling
+                            else if (previousRow == 0) {
+                                if (isWhitePovGlobal) { // White POV (king starts col 4)
+                                    if (c == 6) { // short castle
+                                        boardData[5][0] = boardData[7][0];
+                                        boardData[7][0] = null;
+                                        topRightRookMoved = true;
+                                    } else if (c == 2) { // long castle
+                                        boardData[3][0] = boardData[0][0];
+                                        boardData[0][0] = null;
+                                        topLeftRookMoved = true;
+                                    }
+                                } else { // Black POV (king starts col 3)
+                                    if (c == 1) { // short castle
+                                        boardData[2][0] = boardData[0][0];
+                                        boardData[0][0] = null;
+                                        topLeftRookMoved = true;
+                                    } else if (c == 5) { // long castle
+                                        boardData[4][0] = boardData[7][0];
+                                        boardData[7][0] = null;
+                                        topRightRookMoved = true;
+                                    }
+                                }
+                            }
+                        }
+
+
+
+
                         // repaint
                         refreshBoard(boardData);
 
@@ -59,7 +146,7 @@ public class ChessGUI extends JPanel {
                             List<int[]> candidateMoves = clickedPiece.getCandidateMoves(c, r);
                             List<int[]> obstaclesHandled = clickedPiece.handleObstacles(c, r, boardData, candidateMoves);
                             // handleIsPinnedToKing
-                            List<int[]> isPinnedMoves = clickedPiece.handleIsPinnedToKing(c,r,boardData, obstaclesHandled);
+                            List<int[]> isPinnedMoves = clickedPiece.handleIsPinnedToKing(c, r, boardData, obstaclesHandled);
                             // handleBlocksCheck
                             for (int[] move : isPinnedMoves) {
 //                                System.out.println("A more realistic move is: " + Arrays.toString(move));

@@ -14,16 +14,15 @@ public abstract class Piece {
         return this.isWhite;
     }
 
-    public List<int[]> getCandidateMoves(int column, int row) {
-        System.out.println("This pieces candidate moves haven't been coded");
+    public List<int[]> getCandidateMoves(int column, int row) {  // always overwritten
         return null;
     }
 
-    // needs to be overwritten for pawns and maybe kings, works for bishop, rook, knight, queen
+    // Is overwritten for pawns, supered for kings, works for bishop rook knight queen
     public List<int[]> handleObstacles(int column, int row, Piece[][] boardData, List<int[]> candidateMoves) {
 
         List<int[]> blockedSquares = new ArrayList<>();
-        List<int[]> noObstacles = new ArrayList<>();
+        List<int[]> noObstacles = new ArrayList<>(); // returned at the end
 
         int[][] allDirections = {
                 {-1, -1}, {-1, 0}, {-1, 1},
@@ -37,50 +36,44 @@ public abstract class Piece {
             boolean isBlocked = false;
 
             while (newColumn >= 0 && newColumn < 8 && newRow >= 0 && newRow < 8) {
-                Piece potentialPinner = boardData[newColumn][newRow];
-                if (potentialPinner != null && !isBlocked) {
-                    isBlocked = true;
+                Piece potentialBlocker = boardData[newColumn][newRow];
+                if (potentialBlocker != null && !isBlocked) {
+                    isBlocked = true; // doesn't check team kill
                 } else if (isBlocked) {
-                    blockedSquares.add(new int[]{newColumn, newRow});
+                    blockedSquares.add(new int[]{newColumn, newRow}); //only added AFTER finding first block
                 }
                 newColumn += direction[0];
                 newRow += direction[1];
-
             }
-
         }
 
         for (int[] possibleMove : candidateMoves) {
-            boolean isBlocked = false;
-            for (int[] blocked : blockedSquares) {
-                if (possibleMove[0] == blocked[0] && possibleMove[1] == blocked[1]) {
-                    isBlocked = true;
+            boolean mightBeAdded = true;
+            for (int[] blockedSquare : blockedSquares) { //filtering out blockedSquares from candidateMoves
+                if (possibleMove[0] == blockedSquare[0] && possibleMove[1] == blockedSquare[1]) {
+                    mightBeAdded = false;
                     break;
                 }
             }
-            if (!isBlocked) {
+            if (mightBeAdded) { // isn't blocked
                 Piece maybeCapture = boardData[possibleMove[0]][possibleMove[1]];
-                if (maybeCapture == null || maybeCapture.getIsWhite() != this.getIsWhite()) {
-                    noObstacles.add(possibleMove);
+                if (maybeCapture == null || maybeCapture.getIsWhite() != this.getIsWhite()) { // no teamkill
+                    noObstacles.add(possibleMove); // the big Added
                 }
-
-
             }
         }
-
         return noObstacles;
-
     }
 
     public List<int[]> handleIsPinnedToKing(int column, int row, Piece[][] boardData, List<int[]> noObstacles) {
-        List<int[]> pinHandledMoves = new ArrayList<>();
+        List<int[]> pinHandledMoves = new ArrayList<>(); // returned at end (if pinned)
 
         // Step 1: find my King
         int myKingColumn = -1, myKingRow = -1;
         for (int columnCheck = 0; columnCheck < 8; columnCheck++) {
             for (int rowCheck = 0; rowCheck < 8; rowCheck++) {
                 Piece maybeKing = boardData[columnCheck][rowCheck];
-                if (maybeKing != null && maybeKing instanceof King && maybeKing.getIsWhite() == this.getIsWhite()) {
+                if (maybeKing instanceof King && maybeKing.getIsWhite() == this.getIsWhite()) {
                     myKingColumn = columnCheck;
                     myKingRow = rowCheck;
                 }
@@ -88,48 +81,83 @@ public abstract class Piece {
         }
         if (myKingColumn == -1) { //Shouldn't happen but who knows
             System.out.println("Can't Find King");
-            return noObstacles; // no king found
+            return noObstacles; // f it we ball
         }
 
-        // Step 2: check alignment with King
-        int pieceKingColumnOffset = myKingColumn - column;
-        int pieceKingRowOffset = myKingRow - row;
+        // Step 2 (Optional but optimal): check alignment with King
+        int pieceKingColumnOffset = myKingColumn - column; // these variable aren't optional
+        int pieceKingRowOffset = myKingRow - row; // they do get used later
         boolean aligned = (pieceKingColumnOffset == 0 || pieceKingRowOffset == 0 || Math.abs(pieceKingColumnOffset) == Math.abs(pieceKingRowOffset));
         if (!aligned) {
-            return noObstacles; // not even aligned, impossible to pin
+            return noObstacles; // not even aligned, impossible to pin. Worth cut off... the rest gets crazy.
         }
 
         // Step 3: scan from piece
-        int columnDirection = Integer.compare(0, pieceKingColumnOffset); // 1, 0, or -1
-        int rowDirection = Integer.compare(0, pieceKingRowOffset); // 1, 0, or -1
+        int columnScanDirection = Integer.compare(0, pieceKingColumnOffset); // Go AWAY from king
+        int rowScanDirection = Integer.compare(0, pieceKingRowOffset); // At least to start
 
-        int scanColumn = column + columnDirection;
-        int scanRow = row + rowDirection;
+        int scanColumn = column + columnScanDirection;
+        int scanRow = row + rowScanDirection;
 
         boolean isKingClosest = false;
-        boolean isPinnerClosest = false;
+//        boolean isPinnerClosest = false;
+//
+//        while (scanColumn >= 0 && scanColumn < 8 && scanRow >= 0 && scanRow < 8) {
+//            Piece potentialPinner = boardData[scanColumn][scanRow];
+//            if (potentialPinner != null) {
+//                if (potentialPinner.getIsWhite() != this.getIsWhite()) {
+//                    if ((pieceKingColumnOffset == 0 || pieceKingRowOffset == 0) && (potentialPinner instanceof Rook || potentialPinner instanceof Queen)) {
+//                        isPinnerClosest = true;
+//                        // isStraightPin = true
+////                        System.out.println("Rooky Pin Possible");
+//                    }
+//                    if (Math.abs(columnScanDirection) != 0 && Math.abs(rowScanDirection) != 0 && (potentialPinner instanceof Bishop || potentialPinner instanceof Queen)) {
+//                        isPinnerClosest = true;
+//                        // isDiagonalPin = true
+////                        System.out.println("Bishopy Pin possible");
+//                    }
+//                }
+//                break;
+//            }
+//            scanColumn += columnScanDirection;
+//            scanRow += rowScanDirection;
+//        }
+
+        boolean isVerticalPin = false;
+        boolean isHorizontalPin = false;
+        boolean isDiagonalPin = false;
 
         while (scanColumn >= 0 && scanColumn < 8 && scanRow >= 0 && scanRow < 8) {
             Piece potentialPinner = boardData[scanColumn][scanRow];
             if (potentialPinner != null) {
                 if (potentialPinner.getIsWhite() != this.getIsWhite()) {
-                    if ((columnDirection == 0 || rowDirection == 0) && (potentialPinner instanceof Rook || potentialPinner instanceof Queen)) {
-                        isPinnerClosest = true;
-//                        System.out.println("Rooky Pin Possible");
+                    // Vertical pin: same column
+                    if (pieceKingColumnOffset == 0 && (potentialPinner instanceof Rook || potentialPinner instanceof Queen)) {
+                        isVerticalPin = true;
                     }
-                    if (Math.abs(columnDirection) == 1 && Math.abs(rowDirection) == 1 && (potentialPinner instanceof Bishop || potentialPinner instanceof Queen)) {
-                        isPinnerClosest = true;
-//                        System.out.println("Bishopy Pin possible");
+                    // Horizontal pin: same row
+                    else if (pieceKingRowOffset == 0 && (potentialPinner instanceof Rook || potentialPinner instanceof Queen)) {
+                        isHorizontalPin = true;
                     }
+                    // Diagonal pin: moving along both col + row
+                    else if (columnScanDirection != 0 && rowScanDirection != 0 &&
+                            (potentialPinner instanceof Bishop || potentialPinner instanceof Queen)) {
+                        isDiagonalPin = true;
+                    } else {
+                        return noObstacles; // closest piece wasn't a pinner, lets close up shop.
+                    }
+                } else {
+                    return noObstacles; // closest piece wasn't even an enemy
                 }
                 break;
             }
-            scanColumn += columnDirection;
-            scanRow += rowDirection;
+            scanColumn += columnScanDirection;
+            scanRow += rowScanDirection;
         }
 
-        scanColumn = column - columnDirection;
-        scanRow = row - rowDirection;
+
+        scanColumn = column - columnScanDirection; // now we go the other way
+        scanRow = row - rowScanDirection; // towards the king from piece
 
         while (scanColumn >= 0 && scanColumn < 8 && scanRow >= 0 && scanRow < 8) {
             Piece maybeKing = boardData[scanColumn][scanRow];
@@ -137,40 +165,73 @@ public abstract class Piece {
                 if (maybeKing.getIsWhite() == this.getIsWhite() && maybeKing instanceof King) {
                     isKingClosest = true;
 //                        System.out.println("King Pin possible");
+                } else {
+                    return noObstacles; //closest piece towards king isn't our king
                 }
                 break;
             }
-            scanColumn -= columnDirection;
-            scanRow -= rowDirection;
+            scanColumn -= columnScanDirection; // keep marching toward king
+            scanRow -= rowScanDirection; // this could be += if we switch Integer.compare order
         }
 
         // Step 4: filter legal moves (only along the actual pin line)
-        if (isKingClosest && isPinnerClosest) {
-            for (int[] move : noObstacles) {
-                int newColumn = move[0], newRow = move[1];
+        // pin specification make cleaner?
+//        if (isKingClosest && (isVerticalPin || isHorizontalPin || isDiagonalPin)) {
+//            for (int[] move : noObstacles) {
+//                int newColumn = move[0], newRow = move[1];
+//                int moveKingColumnOffset = newColumn - myKingColumn;
+//                int moveKingRowOffset = newRow - myKingRow;
+//
+//                boolean allowed = false;
+//
+//                if (columnScanDirection == 0 && rowScanDirection != 0) {
+//                    // vertical pin
+//                    allowed = (newColumn == myKingColumn);
+//                } else if (rowScanDirection == 0 && columnScanDirection != 0) {
+//                    // horizontal pin
+//                    allowed = (newRow == myKingRow);
+//                } else {
+//                    // diagonal pin
+//                    if (Math.abs(pieceKingColumnOffset) == Math.abs(pieceKingRowOffset) &&
+//                            Math.abs(moveKingColumnOffset) == Math.abs(moveKingRowOffset)) {
+//                        int moveColumnDirection = Integer.compare(moveKingColumnOffset, 0);
+//                        int moveRowDirection = Integer.compare(moveKingRowOffset, 0);
+//                        // either direction along the same diagonal
+//                        allowed = ((moveColumnDirection == columnScanDirection && moveRowDirection == rowScanDirection) ||
+//                                (moveColumnDirection == -columnScanDirection && moveRowDirection == -rowScanDirection));
+//                    }
+//                }
+//                if (allowed) pinHandledMoves.add(move);
+//            }
+//            return pinHandledMoves;
+//        }
+
+        if (isKingClosest && (isVerticalPin || isHorizontalPin || isDiagonalPin)) {
+            for (int[] maybeOkPinnedMove : noObstacles) {
+                int newColumn = maybeOkPinnedMove[0], newRow = maybeOkPinnedMove[1];
                 int moveKingColumnOffset = newColumn - myKingColumn;
                 int moveKingRowOffset = newRow - myKingRow;
 
                 boolean allowed = false;
 
-                if (columnDirection == 0 && rowDirection != 0) {
-                    // vertical pin
-                    allowed = (newColumn == myKingColumn);
-                } else if (rowDirection == 0 && columnDirection != 0) {
-                    // horizontal pin
-                    allowed = (newRow == myKingRow);
-                } else {
-                    // diagonal pin
-                    if (Math.abs(pieceKingColumnOffset) == Math.abs(pieceKingRowOffset) &&
-                            Math.abs(moveKingColumnOffset) == Math.abs(moveKingRowOffset)) {
+                if (isVerticalPin) {
+                    allowed = (moveKingColumnOffset == 0);
+                } else if (isHorizontalPin) {
+                    allowed = (moveKingRowOffset == 0);
+                } else if (isDiagonalPin) {
+                    if (Math.abs(moveKingColumnOffset) == Math.abs(moveKingRowOffset)) {
                         int moveColumnDirection = Integer.compare(moveKingColumnOffset, 0);
                         int moveRowDirection = Integer.compare(moveKingRowOffset, 0);
-                        // either direction along the same diagonal
-                        allowed = ((moveColumnDirection == columnDirection && moveRowDirection == rowDirection) ||
-                                (moveColumnDirection == -columnDirection && moveRowDirection == -rowDirection));
+
+                        // Either along the scan direction or the opposite
+                        allowed = ((moveColumnDirection == columnScanDirection && moveRowDirection == rowScanDirection) ||
+                                (moveColumnDirection == -columnScanDirection && moveRowDirection == -rowScanDirection));
                     }
                 }
-                if (allowed) pinHandledMoves.add(move);
+
+                if (allowed) {
+                    pinHandledMoves.add(maybeOkPinnedMove);
+                }
             }
             return pinHandledMoves;
         }

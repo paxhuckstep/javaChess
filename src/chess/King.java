@@ -10,7 +10,7 @@ public class King extends Piece {
     }
 
     @Override
-    public List<int[]> getCandidateMoves(int columnumn, int row) {
+    public List<int[]> getCandidateMoves(int column, int row) {
 //        System.out.println("This is a King and candidate moves are actively being coded");
 
         List<int[]> candidateMoves = new ArrayList<>();
@@ -23,7 +23,7 @@ public class King extends Piece {
 
         for (int[] directionection : allDirections) {
             int newRow = row + directionection[0];
-            int newColumn = columnumn + directionection[1];
+            int newColumn = column + directionection[1];
 
             if (newRow >= 0 && newRow < 8 && newColumn >= 0 && newColumn < 8) {
                 candidateMoves.add(new int[]{newColumn, newRow});
@@ -33,12 +33,11 @@ public class King extends Piece {
 
         }
         return candidateMoves;
-
     }
 
     @Override
-    public List<int[]> handleObstacles(int columnumn, int row, Piece[][] boardData, List<int[]> candidateMoves) {
-        List<int[]> noObstacles = super.handleObstacles(columnumn, row, boardData, candidateMoves);
+    public List<int[]> handleObstacles(int column, int row, Piece[][] boardData, List<int[]> candidateMoves) {
+        List<int[]> noObstacles = super.handleObstacles(column, row, boardData, candidateMoves);
 
         boolean isTopKing = (row == 0);
         boolean isBottomKing = (row == 7);
@@ -88,16 +87,16 @@ public class King extends Piece {
                 }
             }
         }
-
         return noObstacles;
     }
 
     @Override
-    public List<int[]> handleNoSelfChecks(int columnumn, int row, Piece[][] boardData, List<int[]> noObstacles) {
+    public List<int[]> handleNoSelfChecks(int column, int row, Piece[][] boardData, List<int[]> noObstacles) {
         List<int[]> safeMoves = new ArrayList<>();
 
         for (int[] noObstacle : noObstacles) {
-            int targetCol = noObstacle[0];
+
+            int targetColumn = noObstacle[0];
             int targetRow = noObstacle[1];
 
             // Step 1: make a simulated board for this move
@@ -107,18 +106,21 @@ public class King extends Piece {
                     simulatedBoard[c][r] = boardData[c][r];
                 }
             }
-            simulatedBoard[columnumn][row] = null;
-//            simulatedBoard[targetCol][targetRow] = this; // place king in new square
+            simulatedBoard[column][row] = null;
+//            simulatedBoard[targetColumn][targetRow] = this; // place king in new square
 
             // Step 2: check if that square is seen by any enemy piece
-            boolean isSquareSeen = getIsSquareSeen(targetCol, targetRow, !this.getIsWhite(), simulatedBoard);
+            boolean isSquareSeen = getIsSquareSeen(targetColumn, targetRow, !this.getIsWhite(), simulatedBoard);
+            boolean isCastleThroughCheck = false;
+            if (Math.abs(targetColumn - column) == 2) {
+                isCastleThroughCheck = getIsSquareSeen((targetColumn + column )/ 2, targetRow, !this.getIsWhite(), simulatedBoard);
+            }
 
             // Step 3: if not seen, add to safeMoves
-            if (!isSquareSeen) {
+            if (!isSquareSeen && !isCastleThroughCheck) {
                 safeMoves.add(noObstacle);
             }
         }
-
         return safeMoves;
     }
 
@@ -183,7 +185,7 @@ public class King extends Piece {
                 int scanRow = row + rowOffset;
                 if (scanColumn >= 0 && scanColumn < 8 && scanRow >= 0 && scanRow < 8) {
                     Piece maybeKingAttacker = simulatedBoardData[scanColumn][scanRow];
-                    if ( maybeKingAttacker != null &&
+                    if (maybeKingAttacker != null &&
                             maybeKingAttacker.getIsWhite() == isWhiteAttack &&
                             maybeKingAttacker instanceof King) {
                         return true;
@@ -193,7 +195,9 @@ public class King extends Piece {
         }
 
         // --- Pawn attacks ---
-        int pawnAttackDirection = ChessGUI.isWhitePovGlobal ? isWhiteAttack ? 1 : -1 : isWhiteAttack ? -1 : 1; // white pawns attack upward (row - 1)
+        int pawnAttackDirection = ChessGUI.isWhitePovGlobal
+                ? (isWhiteAttack ? 1 : -1)
+                : (isWhiteAttack ? -1 : 1);
         int[][] pawnAttackOffsets = {{-1, pawnAttackDirection}, {1, pawnAttackDirection}};
 
         for (int[] pawnOffset : pawnAttackOffsets) {
@@ -208,10 +212,6 @@ public class King extends Piece {
                 }
             }
         }
-
         return false; // no attackers found
     }
-
-
-
 }

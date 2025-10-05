@@ -65,7 +65,7 @@ public abstract class Piece {
         return noObstacles;
     }
 
-    public List<int[]> handleIsPinnedToKing(int column, int row, Piece[][] boardData, List<int[]> noObstacles) {
+    public List<int[]> handleNoSelfChecks(int column, int row, Piece[][] boardData, List<int[]> noObstacles) {
         List<int[]> pinHandledMoves = new ArrayList<>(); // returned at end (if pinned)
 
         // Step 1: find my King
@@ -100,29 +100,6 @@ public abstract class Piece {
         int scanRow = row + rowScanDirection;
 
         boolean isKingClosest = false;
-//        boolean isPinnerClosest = false;
-//
-//        while (scanColumn >= 0 && scanColumn < 8 && scanRow >= 0 && scanRow < 8) {
-//            Piece potentialPinner = boardData[scanColumn][scanRow];
-//            if (potentialPinner != null) {
-//                if (potentialPinner.getIsWhite() != this.getIsWhite()) {
-//                    if ((pieceKingColumnOffset == 0 || pieceKingRowOffset == 0) && (potentialPinner instanceof Rook || potentialPinner instanceof Queen)) {
-//                        isPinnerClosest = true;
-//                        // isStraightPin = true
-////                        System.out.println("Rooky Pin Possible");
-//                    }
-//                    if (Math.abs(columnScanDirection) != 0 && Math.abs(rowScanDirection) != 0 && (potentialPinner instanceof Bishop || potentialPinner instanceof Queen)) {
-//                        isPinnerClosest = true;
-//                        // isDiagonalPin = true
-////                        System.out.println("Bishopy Pin possible");
-//                    }
-//                }
-//                break;
-//            }
-//            scanColumn += columnScanDirection;
-//            scanRow += rowScanDirection;
-//        }
-
         boolean isVerticalPin = false;
         boolean isHorizontalPin = false;
         boolean isDiagonalPin = false;
@@ -131,11 +108,11 @@ public abstract class Piece {
             Piece potentialPinner = boardData[scanColumn][scanRow];
             if (potentialPinner != null) {
                 if (potentialPinner.getIsWhite() != this.getIsWhite()) {
-                    // Vertical pin: same column
+                    // Vertical pin
                     if (pieceKingColumnOffset == 0 && (potentialPinner instanceof Rook || potentialPinner instanceof Queen)) {
                         isVerticalPin = true;
                     }
-                    // Horizontal pin: same row
+                    // Horizontal pin
                     else if (pieceKingRowOffset == 0 && (potentialPinner instanceof Rook || potentialPinner instanceof Queen)) {
                         isHorizontalPin = true;
                     }
@@ -155,7 +132,6 @@ public abstract class Piece {
             scanRow += rowScanDirection;
         }
 
-
         scanColumn = column - columnScanDirection; // now we go the other way
         scanRow = row - rowScanDirection; // towards the king from piece
 
@@ -171,40 +147,8 @@ public abstract class Piece {
                 break;
             }
             scanColumn -= columnScanDirection; // keep marching toward king
-            scanRow -= rowScanDirection; // this could be += if we switch Integer.compare order
+            scanRow -= rowScanDirection; // away from pinner
         }
-
-        // Step 4: filter legal moves (only along the actual pin line)
-        // pin specification make cleaner?
-//        if (isKingClosest && (isVerticalPin || isHorizontalPin || isDiagonalPin)) {
-//            for (int[] move : noObstacles) {
-//                int newColumn = move[0], newRow = move[1];
-//                int moveKingColumnOffset = newColumn - myKingColumn;
-//                int moveKingRowOffset = newRow - myKingRow;
-//
-//                boolean allowed = false;
-//
-//                if (columnScanDirection == 0 && rowScanDirection != 0) {
-//                    // vertical pin
-//                    allowed = (newColumn == myKingColumn);
-//                } else if (rowScanDirection == 0 && columnScanDirection != 0) {
-//                    // horizontal pin
-//                    allowed = (newRow == myKingRow);
-//                } else {
-//                    // diagonal pin
-//                    if (Math.abs(pieceKingColumnOffset) == Math.abs(pieceKingRowOffset) &&
-//                            Math.abs(moveKingColumnOffset) == Math.abs(moveKingRowOffset)) {
-//                        int moveColumnDirection = Integer.compare(moveKingColumnOffset, 0);
-//                        int moveRowDirection = Integer.compare(moveKingRowOffset, 0);
-//                        // either direction along the same diagonal
-//                        allowed = ((moveColumnDirection == columnScanDirection && moveRowDirection == rowScanDirection) ||
-//                                (moveColumnDirection == -columnScanDirection && moveRowDirection == -rowScanDirection));
-//                    }
-//                }
-//                if (allowed) pinHandledMoves.add(move);
-//            }
-//            return pinHandledMoves;
-//        }
 
         if (isKingClosest && (isVerticalPin || isHorizontalPin || isDiagonalPin)) {
             for (int[] maybeOkPinnedMove : noObstacles) {
@@ -219,11 +163,11 @@ public abstract class Piece {
                 } else if (isHorizontalPin) {
                     allowed = (moveKingRowOffset == 0);
                 } else if (isDiagonalPin) {
-                    if (Math.abs(moveKingColumnOffset) == Math.abs(moveKingRowOffset)) {
+                    if (Math.abs(moveKingColumnOffset) == Math.abs(moveKingRowOffset)) { // makes sure is a diagonal.
                         int moveColumnDirection = Integer.compare(moveKingColumnOffset, 0);
                         int moveRowDirection = Integer.compare(moveKingRowOffset, 0);
 
-                        // Either along the scan direction or the opposite
+                        // Either along the scan direction or direct opposite. Remember (+) scan Direction is towards pinner away from king.
                         allowed = ((moveColumnDirection == columnScanDirection && moveRowDirection == rowScanDirection) ||
                                 (moveColumnDirection == -columnScanDirection && moveRowDirection == -rowScanDirection));
                     }
@@ -235,6 +179,6 @@ public abstract class Piece {
             }
             return pinHandledMoves;
         }
-        return noObstacles;
+        return noObstacles; // will this ever even call? I don't think so but is safe.
     }
 }

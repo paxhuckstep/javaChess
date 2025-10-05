@@ -128,7 +128,7 @@ public class ChessGUI extends JPanel {
                         // repaint
                         refreshBoard(boardData);
 
-                    } else {
+                    } else { //clicked non-legal square.#GetMoves
                         for (ChessSquareButton[] cleanRow : boardButtons) {
                             for (ChessSquareButton button : cleanRow) {
                                 button.setIsLegal(false);
@@ -139,9 +139,9 @@ public class ChessGUI extends JPanel {
                             List<int[]> candidateMoves = clickedPiece.getCandidateMoves(c, r);
                             List<int[]> obstaclesHandled = clickedPiece.handleObstacles(c, r, boardData, candidateMoves);
                             // handleIsPinnedToKing
-                            List<int[]> isPinnedMoves = clickedPiece.handleIsPinnedToKing(c, r, boardData, obstaclesHandled);
+                            List<int[]> noSelfChecks = clickedPiece.handleNoSelfChecks(c, r, boardData, obstaclesHandled);
                             // handleBlocksCheck
-                            for (int[] move : isPinnedMoves) {
+                            for (int[] move : noSelfChecks) {
 //                                System.out.println("A more realistic move is: " + Arrays.toString(move));
                                 boardButtons[move[0]][move[1]].setIsLegal(true);
                             }
@@ -184,9 +184,4 @@ public class ChessGUI extends JPanel {
             square.setIcon(null);
         }
     }
-
-//    public boolean getIsWhitePov() {
-//        return isWhitePov;
-//    }
-
 }

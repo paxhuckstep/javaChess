@@ -60,13 +60,18 @@ public class Pawn extends Piece {
                         noObstacles.add(candidateMove);
                     }
                 }
-            }
-            // Diagonal captures: must be enemy piece
-            else if (targetSquarePiece != null && targetSquarePiece.getIsWhite() != this.getIsWhite()) {
+            } else if (
+                // Diagonal captures: must be enemy piece
+                    targetSquarePiece != null && targetSquarePiece.getIsWhite() != this.getIsWhite()
+
+                            //en pessant
+                            || ((candidateMove[0] == ChessGUI.enPessantColumn)
+                            && (ChessGUI.isWhitePovGlobal ? this.getIsWhite()
+                            ? pawnRow == 3 : pawnRow == 4 : this.getIsWhite()
+                            ? pawnRow == 4 : pawnRow == 3))) {
                 noObstacles.add(candidateMove);
             }
         }
         return noObstacles;
     }
-
 }

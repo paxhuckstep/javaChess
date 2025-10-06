@@ -2,8 +2,6 @@ package chess;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 
@@ -12,6 +10,7 @@ public class ChessGUI extends JPanel {
     public static boolean isWhitePovGlobal;
     private static Piece lastClickedPiece = null;
     public static int[] lastClickedSquare = new int[2];
+    public static int enPessantColumn = -1;
 
     public static boolean topLeftRookMoved = false;
     public static boolean topRightRookMoved = false;
@@ -47,11 +46,32 @@ public class ChessGUI extends JPanel {
                 squareButton.addActionListener(e -> {
 //                    System.out.println("Clicked square: " + c + "," + r);
 //                    Piece clickedPiece = boardData[c][r];
-                    if (boardButtons[c][r].getIsLegal()) {
+                    if (boardButtons[c][r].getIsLegal()) { // is a legal move
+
+                        //handleEnPessant
+                        if (lastClickedPiece instanceof Pawn && lastClickedSquare[0] != c && boardData[c][r] == null) {
+//                            System.out.println("It's an en pessant capture!");
+                            boardData[c][r - (isWhitePovGlobal ? lastClickedPiece.getIsWhite() ? - 1 : 1 : lastClickedPiece.getIsWhite() ? 1 : -1)] = null;
+                        }
 
                         //move piece
                         boardData[lastClickedSquare[0]][lastClickedSquare[1]] = null;
                         boardData[c][r] = lastClickedPiece;
+
+
+//                        System.out.println("ClickedSquare: " + c + ", " + r);
+//                        System.out.println("Square Behind: : " + c + ", " + (r - (isWhitePovGlobal ? lastClickedPiece.getIsWhite() ? - 1 : 1 : lastClickedPiece.getIsWhite() ? 1 : -1)));
+//                        System.out.println("enPessant Column: " + enPessantColumn);
+
+
+
+                        //EnPessant Rights Check
+                        if (lastClickedPiece instanceof Pawn && Math.abs(r - lastClickedSquare[1]) == 2) {
+                            enPessantColumn = c;
+                        } else {
+                            enPessantColumn = -1;
+                        }
+
 
                         //Castling Rights Check
                         if (lastClickedPiece instanceof King) {

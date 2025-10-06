@@ -190,7 +190,7 @@ public class ChessGUI extends JPanel {
                             }
                         }
                         Piece clickedPiece = boardData[c][r];
-                        if (clickedPiece != null && clickedPiece.getIsWhite() == isWhiteTurn) { // #GetMoves
+                        if (clickedPiece != null && clickedPiece.getIsWhite() == isWhiteTurn && hundredHalfMoveCount < 100) { // #GetMoves
                             List<int[]> candidateMoves = clickedPiece.getCandidateMoves(c, r);
                             List<int[]> obstaclesHandled = clickedPiece.handleObstacles(c, r, boardData, candidateMoves);
                             List<int[]> noSelfChecks = clickedPiece.handleNoSelfChecks(c, r, boardData, obstaclesHandled);

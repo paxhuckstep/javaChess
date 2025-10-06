@@ -148,7 +148,7 @@ public abstract class Piece {
         }
 
         // --- Pawn attacks ---
-        int pawnAttackDirection = ChessGUI.isWhitePovGlobal ? (isWhiteAttack ? 1 : -1) : (isWhiteAttack ? -1 : 1);
+        int pawnAttackDirection = ChessGUI.isWhitePovGlobal == isWhiteAttack ? 1 : -1;
         int[][] pawnAttackOffsets = {{-1, pawnAttackDirection}, {1, pawnAttackDirection}};
 
         for (int[] pawnOffset : pawnAttackOffsets) {
@@ -193,7 +193,7 @@ public abstract class Piece {
         int scanColumn = pieceColumn + columnScanDirection;
         int scanRow = pieceRow + rowScanDirection;
 
-        boolean isKingClosest = false;
+        boolean isKingPinnable = false;
         boolean isVerticalPin = false;
         boolean isHorizontalPin = false;
         boolean isDiagonalPin = false;
@@ -233,7 +233,7 @@ public abstract class Piece {
             Piece maybeKing = boardData[scanColumn][scanRow];
             if (maybeKing != null) {
                 if (maybeKing.getIsWhite() == this.getIsWhite() && maybeKing instanceof King) {
-                    isKingClosest = true;
+                    isKingPinnable = true;
 //                        System.out.println("King Pin possible");
                 } else {
                     return noObstacles; //closest piece towards king isn't our king
@@ -244,7 +244,7 @@ public abstract class Piece {
             scanRow -= rowScanDirection; // away from pinner
         }
 
-        if (isKingClosest && (isVerticalPin || isHorizontalPin || isDiagonalPin)) {
+        if (isKingPinnable && (isVerticalPin || isHorizontalPin || isDiagonalPin)) {
             for (int[] maybeOkPinnedMove : noObstacles) {
                 int moveKingColumnOffset = maybeOkPinnedMove[0] - myKingColumn;
                 int moveKingRowOffset = maybeOkPinnedMove[1] - myKingRow;

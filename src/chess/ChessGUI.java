@@ -128,6 +128,20 @@ public class ChessGUI extends JPanel {
                                 }
                             }
                         }
+
+                        //handlePromotion
+                        if (lastClickedPiece instanceof Pawn && (r == 0 || r == 7)) {
+                            String promotionPiece = PromotionGUI.openPromotionPopup(BigGUI.bigGuiReference, lastClickedPiece.getIsWhite());
+                            if (promotionPiece != null) {
+                                switch (promotionPiece) {
+                                    case "queen":  boardData[c][r] = new Queen(lastClickedPiece.getIsWhite()); break;
+                                    case "rook":   boardData[c][r] = new Rook(lastClickedPiece.getIsWhite()); break;
+                                    case "bishop": boardData[c][r] = new Bishop(lastClickedPiece.getIsWhite()); break;
+                                    case "knight": boardData[c][r] = new Knight(lastClickedPiece.getIsWhite()); break;
+                                }
+                            }
+                        }
+
                         // repaint
                         refreshBoard(boardData);
 

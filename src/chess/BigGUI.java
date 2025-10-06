@@ -7,8 +7,11 @@ import java.awt.*;
 
 public class BigGUI extends JFrame {
     private ChessGUI chessBoard;
+    public static JFrame bigGuiReference;
 
     public BigGUI() {
+        bigGuiReference = this;
+
         setTitle("Chess Application");
         setSize(800, 800);
         setDefaultCloseOperation(EXIT_ON_CLOSE);

@@ -60,8 +60,7 @@ public class ChessGUI extends JPanel {
                             } else if (lastClickedSquare[1] == 7) {
                                 bottomKingMoved = true;
                             }
-                        }
-                        else if (lastClickedPiece instanceof Rook) {
+                        } else if (lastClickedPiece instanceof Rook) {
                             if (lastClickedSquare[1] == 0) { // top row
                                 if (lastClickedSquare[0] == 0) topLeftRookMoved = true;
                                 if (lastClickedSquare[0] == 7) topRightRookMoved = true;
@@ -138,16 +137,12 @@ public class ChessGUI extends JPanel {
                         if (clickedPiece != null) {
                             List<int[]> candidateMoves = clickedPiece.getCandidateMoves(c, r);
                             List<int[]> obstaclesHandled = clickedPiece.handleObstacles(c, r, boardData, candidateMoves);
-                            // handleIsPinnedToKing
                             List<int[]> noSelfChecks = clickedPiece.handleNoSelfChecks(c, r, boardData, obstaclesHandled);
-                            // handleBlocksCheck
-                            for (int[] move : noSelfChecks) {
-//                                System.out.println("A more realistic move is: " + Arrays.toString(move));
+                            List<int[]> blocksAnyChecks = clickedPiece.handleBlocksCheck(c, r, boardData, noSelfChecks);
+
+                            for (int[] move : blocksAnyChecks) {
                                 boardButtons[move[0]][move[1]].setIsLegal(true);
                             }
-//                            for (int[] move : candidateMoves) {
-//                                System.out.println("A candidate move is: " + Arrays.toString(move));
-//                            }
                         }
                         lastClickedPiece = clickedPiece;
                         lastClickedSquare = new int[]{c, r};

@@ -124,88 +124,90 @@ public class King extends Piece {
 
     /// ///////////////////////////////////////////////////////////////////////////////////////
 
-    private boolean getIsSquareSeen(int targetColumn, int targetRow, boolean isWhiteAttack, Piece[][] simulatedBoardData) {
-        // Used to check if a square is attacked by the opposing color (isWhiteAttack = attacker color)
 
-        int[][] allDirections = {
-                {1, 0}, {-1, 0}, {0, 1}, {0, -1},   // straight lines (rook/queen)
-                {1, 1}, {1, -1}, {-1, 1}, {-1, -1}  // diagonals (bishop/queen)
-        };
-
-        // --- Sliding pieces (Rooks, Bishops, Queens) ---
-        for (int[] direction : allDirections) {
-            int scanColumn = targetColumn + direction[0];
-            int scanRow = targetRow + direction[1];
-
-            while (scanColumn >= 0 && scanColumn < 8 && scanRow >= 0 && scanRow < 8) {
-                Piece potentialAttacker = simulatedBoardData[scanColumn][scanRow];
-                if (potentialAttacker != null) {
-                    if (potentialAttacker.getIsWhite() == isWhiteAttack) {
-                        boolean isStraightAttack = (direction[0] == 0 || direction[1] == 0);
-                        boolean isDiagonalAttack = Math.abs(direction[0]) == Math.abs(direction[1]);
-
-                        if ((isStraightAttack && (potentialAttacker instanceof Rook || potentialAttacker instanceof Queen)) ||
-                                (isDiagonalAttack && (potentialAttacker instanceof Bishop || potentialAttacker instanceof Queen))) {
-                            return true;
-                        }
-                    }
-                    break; // first piece blocks the rest
-                }
-                scanColumn += direction[0];
-                scanRow += direction[1];
-            }
-        }
-
-        // --- Knight attacks ---
-        int[][] allKnightMoves = {
-                {1, 2}, {2, 1}, {-1, 2}, {-2, 1},
-                {1, -2}, {2, -1}, {-1, -2}, {-2, -1}
-        };
-
-        for (int[] knightMove : allKnightMoves) {
-            int scanColumn = targetColumn + knightMove[0];
-            int scanRow = targetRow + knightMove[1];
-            if (scanColumn >= 0 && scanColumn < 8 && scanRow >= 0 && scanRow < 8) {
-                Piece maybeKnightAttacker = simulatedBoardData[scanColumn][scanRow];
-                if (maybeKnightAttacker != null &&
-                        maybeKnightAttacker.getIsWhite() == isWhiteAttack &&
-                        maybeKnightAttacker instanceof Knight) {
-                    return true;
-                }
-            }
-        }
-
-        // --- King attacks (adjacent squares) ---
-        for (int columnOffset = -1; columnOffset <= 1; columnOffset++) {
-            for (int rowOffset = -1; rowOffset <= 1; rowOffset++) {
-                if (columnOffset == 0 && rowOffset == 0) continue;
-                int scanColumn = targetColumn + columnOffset;
-                int scanRow = targetRow + rowOffset;
-                if (scanColumn >= 0 && scanColumn < 8 && scanRow >= 0 && scanRow < 8) {
-                    Piece maybeKingAttacker = simulatedBoardData[scanColumn][scanRow];
-                    if (maybeKingAttacker != null &&
-                            maybeKingAttacker.getIsWhite() == isWhiteAttack &&
-                            maybeKingAttacker instanceof King) {
-                        return true;
-                    }
-                }
-            }
-        }
-
-        // --- Pawn attacks ---
-        int pawnAttackDirection = ChessGUI.isWhitePovGlobal ? (isWhiteAttack ? 1 : -1) : (isWhiteAttack ? -1 : 1);
-        int[][] pawnAttackOffsets = {{-1, pawnAttackDirection}, {1, pawnAttackDirection}};
-
-        for (int[] pawnOffset : pawnAttackOffsets) {
-            int scanColumn = targetColumn + pawnOffset[0];
-            int scanRow = targetRow + pawnOffset[1];
-            if (scanColumn >= 0 && scanColumn < 8 && scanRow >= 0 && scanRow < 8) {
-                Piece maybePawnAttacker = simulatedBoardData[scanColumn][scanRow];
-                if (maybePawnAttacker != null && maybePawnAttacker.getIsWhite() == isWhiteAttack && maybePawnAttacker instanceof Pawn) {
-                    return true;
-                }
-            }
-        }
-        return false; // no attackers found
-    }
+//
+//    private boolean getIsSquareSeen(int targetColumn, int targetRow, boolean isWhiteAttack, Piece[][] simulatedBoardData) {
+//        // Used to check if a square is attacked by the opposing color (isWhiteAttack = attacker color)
+//
+//        int[][] allDirections = {
+//                {1, 0}, {-1, 0}, {0, 1}, {0, -1},   // straight lines (rook/queen)
+//                {1, 1}, {1, -1}, {-1, 1}, {-1, -1}  // diagonals (bishop/queen)
+//        };
+//
+//        // --- Sliding pieces (Rooks, Bishops, Queens) ---
+//        for (int[] direction : allDirections) {
+//            int scanColumn = targetColumn + direction[0];
+//            int scanRow = targetRow + direction[1];
+//
+//            while (scanColumn >= 0 && scanColumn < 8 && scanRow >= 0 && scanRow < 8) {
+//                Piece potentialAttacker = simulatedBoardData[scanColumn][scanRow];
+//                if (potentialAttacker != null) {
+//                    if (potentialAttacker.getIsWhite() == isWhiteAttack) {
+//                        boolean isStraightAttack = (direction[0] == 0 || direction[1] == 0);
+//                        boolean isDiagonalAttack = Math.abs(direction[0]) == Math.abs(direction[1]);
+//
+//                        if ((isStraightAttack && (potentialAttacker instanceof Rook || potentialAttacker instanceof Queen)) ||
+//                                (isDiagonalAttack && (potentialAttacker instanceof Bishop || potentialAttacker instanceof Queen))) {
+//                            return true;
+//                        }
+//                    }
+//                    break; // first piece blocks the rest
+//                }
+//                scanColumn += direction[0];
+//                scanRow += direction[1];
+//            }
+//        }
+//
+//        // --- Knight attacks ---
+//        int[][] allKnightMoves = {
+//                {1, 2}, {2, 1}, {-1, 2}, {-2, 1},
+//                {1, -2}, {2, -1}, {-1, -2}, {-2, -1}
+//        };
+//
+//        for (int[] knightMove : allKnightMoves) {
+//            int scanColumn = targetColumn + knightMove[0];
+//            int scanRow = targetRow + knightMove[1];
+//            if (scanColumn >= 0 && scanColumn < 8 && scanRow >= 0 && scanRow < 8) {
+//                Piece maybeKnightAttacker = simulatedBoardData[scanColumn][scanRow];
+//                if (maybeKnightAttacker != null &&
+//                        maybeKnightAttacker.getIsWhite() == isWhiteAttack &&
+//                        maybeKnightAttacker instanceof Knight) {
+//                    return true;
+//                }
+//            }
+//        }
+//
+//        // --- King attacks (adjacent squares) ---
+//        for (int columnOffset = -1; columnOffset <= 1; columnOffset++) {
+//            for (int rowOffset = -1; rowOffset <= 1; rowOffset++) {
+//                if (columnOffset == 0 && rowOffset == 0) continue;
+//                int scanColumn = targetColumn + columnOffset;
+//                int scanRow = targetRow + rowOffset;
+//                if (scanColumn >= 0 && scanColumn < 8 && scanRow >= 0 && scanRow < 8) {
+//                    Piece maybeKingAttacker = simulatedBoardData[scanColumn][scanRow];
+//                    if (maybeKingAttacker != null &&
+//                            maybeKingAttacker.getIsWhite() == isWhiteAttack &&
+//                            maybeKingAttacker instanceof King) {
+//                        return true;
+//                    }
+//                }
+//            }
+//        }
+//
+//        // --- Pawn attacks ---
+//        int pawnAttackDirection = ChessGUI.isWhitePovGlobal ? (isWhiteAttack ? 1 : -1) : (isWhiteAttack ? -1 : 1);
+//        int[][] pawnAttackOffsets = {{-1, pawnAttackDirection}, {1, pawnAttackDirection}};
+//
+//        for (int[] pawnOffset : pawnAttackOffsets) {
+//            int scanColumn = targetColumn + pawnOffset[0];
+//            int scanRow = targetRow + pawnOffset[1];
+//            if (scanColumn >= 0 && scanColumn < 8 && scanRow >= 0 && scanRow < 8) {
+//                Piece maybePawnAttacker = simulatedBoardData[scanColumn][scanRow];
+//                if (maybePawnAttacker != null && maybePawnAttacker.getIsWhite() == isWhiteAttack && maybePawnAttacker instanceof Pawn) {
+//                    return true;
+//                }
+//            }
+//        }
+//        return false; // no attackers found
+//    }
 }

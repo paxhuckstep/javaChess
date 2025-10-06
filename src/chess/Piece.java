@@ -65,28 +65,122 @@ public abstract class Piece {
         return noObstacles;
     }
 
-    public List<int[]> handleNoSelfChecks(int column, int row, Piece[][] boardData, List<int[]> noObstacles) {
-        List<int[]> pinHandledMoves = new ArrayList<>(); // returned at end (if pinned)
-
-        // Step 1: find my King
-        int myKingColumn = -1, myKingRow = -1;
-        for (int columnCheck = 0; columnCheck < 8; columnCheck++) {
-            for (int rowCheck = 0; rowCheck < 8; rowCheck++) {
-                Piece maybeKing = boardData[columnCheck][rowCheck];
-                if (maybeKing instanceof King && maybeKing.getIsWhite() == this.getIsWhite()) {
-                    myKingColumn = columnCheck;
-                    myKingRow = rowCheck;
+    private int[] findMyKing(Piece[][] boardData) {
+        for (int maybeKingColumn = 0; maybeKingColumn < 8; maybeKingColumn++) {
+            for (int maybeKingRow = 0; maybeKingRow < 8; maybeKingRow++) {
+                Piece maybeKing = boardData[maybeKingColumn][maybeKingRow];
+                if (maybeKing != null && maybeKing instanceof King && maybeKing.getIsWhite() == this.getIsWhite()) {
+                    return new int[]{maybeKingColumn, maybeKingRow};
                 }
             }
         }
-        if (myKingColumn == -1) { //Shouldn't happen but who knows
+        System.out.println("Can't find my king — something's wrong.");
+        return new int[]{-1, -1};
+    }
+
+
+    protected boolean getIsSquareSeen(int targetColumn, int targetRow, boolean isWhiteAttack, Piece[][] simulatedBoardData) {
+        // Used to check if a square is attacked by the opposing color (isWhiteAttack = attacker color)
+
+        int[][] allDirections = {
+                {1, 0}, {-1, 0}, {0, 1}, {0, -1},   // straight lines (rook/queen)
+                {1, 1}, {1, -1}, {-1, 1}, {-1, -1}  // diagonals (bishop/queen)
+        };
+
+        // --- Sliding pieces (Rooks, Bishops, Queens) ---
+        for (int[] direction : allDirections) {
+            int scanColumn = targetColumn + direction[0];
+            int scanRow = targetRow + direction[1];
+
+            while (scanColumn >= 0 && scanColumn < 8 && scanRow >= 0 && scanRow < 8) {
+                Piece potentialAttacker = simulatedBoardData[scanColumn][scanRow];
+                if (potentialAttacker != null) {
+                    if (potentialAttacker.getIsWhite() == isWhiteAttack) {
+                        boolean isStraightAttack = (direction[0] == 0 || direction[1] == 0);
+                        boolean isDiagonalAttack = Math.abs(direction[0]) == Math.abs(direction[1]);
+
+                        if ((isStraightAttack && (potentialAttacker instanceof Rook || potentialAttacker instanceof Queen)) ||
+                                (isDiagonalAttack && (potentialAttacker instanceof Bishop || potentialAttacker instanceof Queen))) {
+                            return true;
+                        }
+                    }
+                    break; // first piece blocks the rest
+                }
+                scanColumn += direction[0];
+                scanRow += direction[1];
+            }
+        }
+
+        // --- Knight attacks ---
+        int[][] allKnightMoves = {
+                {1, 2}, {2, 1}, {-1, 2}, {-2, 1},
+                {1, -2}, {2, -1}, {-1, -2}, {-2, -1}
+        };
+
+        for (int[] knightMove : allKnightMoves) {
+            int scanColumn = targetColumn + knightMove[0];
+            int scanRow = targetRow + knightMove[1];
+            if (scanColumn >= 0 && scanColumn < 8 && scanRow >= 0 && scanRow < 8) {
+                Piece maybeKnightAttacker = simulatedBoardData[scanColumn][scanRow];
+                if (maybeKnightAttacker != null &&
+                        maybeKnightAttacker.getIsWhite() == isWhiteAttack &&
+                        maybeKnightAttacker instanceof Knight) {
+                    return true;
+                }
+            }
+        }
+
+        // --- King attacks (adjacent squares) ---
+        for (int columnOffset = -1; columnOffset <= 1; columnOffset++) {
+            for (int rowOffset = -1; rowOffset <= 1; rowOffset++) {
+                if (columnOffset == 0 && rowOffset == 0) continue;
+                int scanColumn = targetColumn + columnOffset;
+                int scanRow = targetRow + rowOffset;
+                if (scanColumn >= 0 && scanColumn < 8 && scanRow >= 0 && scanRow < 8) {
+                    Piece maybeKingAttacker = simulatedBoardData[scanColumn][scanRow];
+                    if (maybeKingAttacker != null &&
+                            maybeKingAttacker.getIsWhite() == isWhiteAttack &&
+                            maybeKingAttacker instanceof King) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        // --- Pawn attacks ---
+        int pawnAttackDirection = ChessGUI.isWhitePovGlobal ? (isWhiteAttack ? 1 : -1) : (isWhiteAttack ? -1 : 1);
+        int[][] pawnAttackOffsets = {{-1, pawnAttackDirection}, {1, pawnAttackDirection}};
+
+        for (int[] pawnOffset : pawnAttackOffsets) {
+            int scanColumn = targetColumn + pawnOffset[0];
+            int scanRow = targetRow + pawnOffset[1];
+            if (scanColumn >= 0 && scanColumn < 8 && scanRow >= 0 && scanRow < 8) {
+                Piece maybePawnAttacker = simulatedBoardData[scanColumn][scanRow];
+                if (maybePawnAttacker != null && maybePawnAttacker.getIsWhite() == isWhiteAttack && maybePawnAttacker instanceof Pawn) {
+                    return true;
+                }
+            }
+        }
+        return false; // no attackers found
+    }
+
+    public List<int[]> handleNoSelfChecks(int pieceColumn, int pieceRow, Piece[][] boardData, List<int[]> noObstacles) {
+        List<int[]> pinHandledMoves = new ArrayList<>(); // returned at end (if pinned)
+
+        // Step 1: find my King
+
+        int[] myKingCoordinates = findMyKing(boardData);
+
+        int myKingColumn = myKingCoordinates[0], myKingRow = myKingCoordinates[1];
+//
+        if (myKingCoordinates[0] == -1) { //Shouldn't happen but who knows
             System.out.println("Can't Find King");
             return noObstacles; // f it we ball
         }
 
         // Step 2 (Optional but optimal): check alignment with King
-        int pieceKingColumnOffset = myKingColumn - column; // these variable aren't optional
-        int pieceKingRowOffset = myKingRow - row; // they do get used later
+        int pieceKingColumnOffset = myKingCoordinates[0] - pieceColumn; // these variable aren't optional
+        int pieceKingRowOffset = myKingCoordinates[1] - pieceRow; // they do get used later
         boolean aligned = (pieceKingColumnOffset == 0 || pieceKingRowOffset == 0 || Math.abs(pieceKingColumnOffset) == Math.abs(pieceKingRowOffset));
         if (!aligned) {
             return noObstacles; // not even aligned, impossible to pin. Worth cut off... the rest gets crazy.
@@ -96,8 +190,8 @@ public abstract class Piece {
         int columnScanDirection = Integer.compare(0, pieceKingColumnOffset); // Go AWAY from king
         int rowScanDirection = Integer.compare(0, pieceKingRowOffset); // At least to start
 
-        int scanColumn = column + columnScanDirection;
-        int scanRow = row + rowScanDirection;
+        int scanColumn = pieceColumn + columnScanDirection;
+        int scanRow = pieceRow + rowScanDirection;
 
         boolean isKingClosest = false;
         boolean isVerticalPin = false;
@@ -132,8 +226,8 @@ public abstract class Piece {
             scanRow += rowScanDirection;
         }
 
-        scanColumn = column - columnScanDirection; // now we go the other way
-        scanRow = row - rowScanDirection; // towards the king from piece
+        scanColumn = pieceColumn - columnScanDirection; // now we go the other way
+        scanRow = pieceRow - rowScanDirection; // towards the king from piece
 
         while (scanColumn >= 0 && scanColumn < 8 && scanRow >= 0 && scanRow < 8) {
             Piece maybeKing = boardData[scanColumn][scanRow];
@@ -180,4 +274,45 @@ public abstract class Piece {
         }
         return noObstacles; // will this ever even call? I don't think so but is safe.
     }
+
+    public List<int[]> handleBlocksCheck(int pieceColumn, int pieceRow, Piece[][] boardData, List<int[]> noSelfCheckMoves) {
+        List<int[]> blockingMoves = new ArrayList<>();
+
+        // Step 1: find my king
+        int[] myKingCoordinates = findMyKing(boardData);
+        int kingColumn = myKingCoordinates[0];
+        int kingRow = myKingCoordinates[1];
+        if (kingColumn == -1) {
+            System.out.println("handleBlocksCheck: Cannot find king.");
+            return noSelfCheckMoves;
+        }
+
+        boolean isInCheck = getIsSquareSeen(kingColumn, kingRow, !this.getIsWhite(), boardData);
+
+        if (!isInCheck) {
+            return noSelfCheckMoves;
+        }
+
+        for (int[] noSelfCheckMove : noSelfCheckMoves) {
+            Piece[][] simulatedBoard = new Piece[8][8];
+            for (int c = 0; c < 8; c++) {
+                for (int r = 0; r < 8; r++) {
+                    simulatedBoard[c][r] = boardData[c][r];
+                }
+            }
+            simulatedBoard[noSelfCheckMove[0]][noSelfCheckMove[1]] = this;
+            simulatedBoard[pieceColumn][pieceRow] = null;
+            boolean isStillInCheck = getIsSquareSeen(kingColumn, kingRow, !this.getIsWhite(), simulatedBoard);
+            if (!isStillInCheck) {
+                blockingMoves.add(noSelfCheckMove);
+            }
+        }
+
+
+        return blockingMoves;
+
+    }
+
 }
+
+

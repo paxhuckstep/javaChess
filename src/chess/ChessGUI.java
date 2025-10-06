@@ -37,43 +37,28 @@ public class ChessGUI extends JPanel {
                     squareButton.setBackground(darkSquareColor);
                 }
 
-//                Piece piece = boardData[column][row]; THESE I TOOK OUT
-//                updateSquareIcon(squareButton, piece);
-
-
                 int c = column;
                 int r = row;
                 squareButton.addActionListener(e -> {
-//                    System.out.println("Clicked square: " + c + "," + r);
-//                    Piece clickedPiece = boardData[c][r];
                     if (boardButtons[c][r].getIsLegal()) { // is a legal move
 
-                        //handleEnPessant
+                        //handle EnPessant capture
                         if (lastClickedPiece instanceof Pawn && lastClickedSquare[0] != c && boardData[c][r] == null) {
-//                            System.out.println("It's an en pessant capture!");
-                            boardData[c][r - (isWhitePovGlobal ? lastClickedPiece.getIsWhite() ? - 1 : 1 : lastClickedPiece.getIsWhite() ? 1 : -1)] = null;
+                            boardData[c][r - (isWhitePovGlobal == lastClickedPiece.getIsWhite() ? - 1 : 1)] = null;
                         }
 
                         //move piece
                         boardData[lastClickedSquare[0]][lastClickedSquare[1]] = null;
                         boardData[c][r] = lastClickedPiece;
 
-
-//                        System.out.println("ClickedSquare: " + c + ", " + r);
-//                        System.out.println("Square Behind: : " + c + ", " + (r - (isWhitePovGlobal ? lastClickedPiece.getIsWhite() ? - 1 : 1 : lastClickedPiece.getIsWhite() ? 1 : -1)));
-//                        System.out.println("enPessant Column: " + enPessantColumn);
-
-
-
-                        //EnPessant Rights Check
+                        //EnPessant Rights Update
                         if (lastClickedPiece instanceof Pawn && Math.abs(r - lastClickedSquare[1]) == 2) {
                             enPessantColumn = c;
                         } else {
                             enPessantColumn = -1;
                         }
 
-
-                        //Castling Rights Check
+                        //Castling Rights Update
                         if (lastClickedPiece instanceof King) {
                             if (lastClickedSquare[1] == 0) {
                                 topKingMoved = true;
@@ -143,25 +128,25 @@ public class ChessGUI extends JPanel {
                                 }
                             }
                         }
-
                         // repaint
                         refreshBoard(boardData);
 
-                    } else { //clicked non-legal square.#GetMoves
+                    } else { //clicked non-legal square
+                        //Clean off old legal moves
                         for (ChessSquareButton[] cleanRow : boardButtons) {
                             for (ChessSquareButton button : cleanRow) {
                                 button.setIsLegal(false);
                             }
                         }
                         Piece clickedPiece = boardData[c][r];
-                        if (clickedPiece != null) {
+                        if (clickedPiece != null) { // #GetMoves
                             List<int[]> candidateMoves = clickedPiece.getCandidateMoves(c, r);
                             List<int[]> obstaclesHandled = clickedPiece.handleObstacles(c, r, boardData, candidateMoves);
                             List<int[]> noSelfChecks = clickedPiece.handleNoSelfChecks(c, r, boardData, obstaclesHandled);
-                            List<int[]> blocksAnyChecks = clickedPiece.handleBlocksCheck(c, r, boardData, noSelfChecks);
+                            List<int[]> legalMoves = clickedPiece.handleBlocksCheck(c, r, boardData, noSelfChecks);
 
-                            for (int[] move : blocksAnyChecks) {
-                                boardButtons[move[0]][move[1]].setIsLegal(true);
+                            for (int[] legalMove : legalMoves) {
+                                boardButtons[legalMove[0]][legalMove[1]].setIsLegal(true);
                             }
                         }
                         lastClickedPiece = clickedPiece;

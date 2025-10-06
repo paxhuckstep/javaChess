@@ -60,8 +60,8 @@ public class Pawn extends Piece {
                         noObstacles.add(candidateMove);
                     }
                 }
-            } else if (
-                // Diagonal captures: must be enemy piece
+            } else if ( // Diagonal captures:
+                        // enemy piece
                     targetSquarePiece != null && targetSquarePiece.getIsWhite() != this.getIsWhite()
 
                             //en pessant

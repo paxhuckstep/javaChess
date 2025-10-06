@@ -13,6 +13,7 @@ public class ChessGUI extends JPanel {
     private static Piece lastClickedPiece = null;
     public static int[] lastClickedSquare = new int[2];
     public static int enPessantColumn = -1;
+    private static int hundredHalfMoveCount;
 
     public static boolean topLeftRookMoved = false;
     public static boolean topRightRookMoved = false;
@@ -47,6 +48,12 @@ public class ChessGUI extends JPanel {
                         //handle EnPessant capture
                         if (lastClickedPiece instanceof Pawn && lastClickedSquare[0] != c && boardData[c][r] == null) {
                             boardData[c][r - (isWhitePovGlobal == lastClickedPiece.getIsWhite() ? -1 : 1)] = null;
+                        }
+
+                        if (lastClickedPiece instanceof Pawn || boardData[c][r] != null) {
+                            hundredHalfMoveCount = 0;
+                        } else {
+                            hundredHalfMoveCount++;
                         }
 
                         //move piece
@@ -159,7 +166,7 @@ public class ChessGUI extends JPanel {
 
                         //end of game check
                         if (isStalemate()) {
-                            String endGameMessage = "";
+                            String endGameMessage;
                             if (isCheck()) {
                                 if (isWhiteTurn) {
                                     endGameMessage = "Black Wins by Checkmate!";
@@ -170,6 +177,8 @@ public class ChessGUI extends JPanel {
                                 endGameMessage = "Stalemate!";
                             }
                             JOptionPane.showMessageDialog(BigGUI.bigGuiReference, endGameMessage);
+                        } else if (hundredHalfMoveCount == 100) {
+                            JOptionPane.showMessageDialog(BigGUI.bigGuiReference, "Draw, 50 move rule");
                         }
 
 
@@ -231,6 +240,7 @@ public class ChessGUI extends JPanel {
         bottomRightRookMoved = false;
         enPessantColumn = -1;
         isWhiteTurn = true;
+        hundredHalfMoveCount = 0;
 
         boardData = resetBoardData;
         refreshBoard(resetBoardData);

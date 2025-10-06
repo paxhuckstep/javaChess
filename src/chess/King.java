@@ -10,7 +10,7 @@ public class King extends Piece {
     }
 
     @Override
-    public List<int[]> getCandidateMoves(int column, int row) {
+    public List<int[]> getCandidateMoves(int kingColumn, int kingRow) {
 //        System.out.println("This is a King and candidate moves are actively being coded");
 
         List<int[]> candidateMoves = new ArrayList<>();
@@ -22,13 +22,11 @@ public class King extends Piece {
         };
 
         for (int[] directionection : allDirections) {
-            int newRow = row + directionection[0];
-            int newColumn = column + directionection[1];
+            int newRow = kingRow + directionection[0];
+            int newColumn = kingColumn + directionection[1];
 
             if (newRow >= 0 && newRow < 8 && newColumn >= 0 && newColumn < 8) {
                 candidateMoves.add(new int[]{newColumn, newRow});
-//                newRow +=directionection[0];
-//                newColumn +=directionection[1];
             }
 
         }
@@ -36,11 +34,11 @@ public class King extends Piece {
     }
 
     @Override
-    public List<int[]> handleObstacles(int column, int row, Piece[][] boardData, List<int[]> candidateMoves) {
-        List<int[]> noObstacles = super.handleObstacles(column, row, boardData, candidateMoves);
+    public List<int[]> handleObstacles(int kingColumn, int kingRow, Piece[][] boardData, List<int[]> candidateMoves) {
+        List<int[]> noObstacles = super.handleObstacles(kingColumn, kingRow, boardData, candidateMoves);
 
-        boolean isTopKing = (row == 0);
-        boolean isBottomKing = (row == 7);
+        boolean isTopKing = (kingRow == 0);
+        boolean isBottomKing = (kingRow == 7);
 
         // Handle bottom king (row 7)
         if (isBottomKing && !ChessGUI.bottomKingMoved) {
@@ -91,7 +89,7 @@ public class King extends Piece {
     }
 
     @Override
-    public List<int[]> handleNoSelfChecks(int column, int row, Piece[][] boardData, List<int[]> noObstacles) {
+    public List<int[]> handleNoSelfChecks(int kingColumn, int kingRow, Piece[][] boardData, List<int[]> noObstacles) {
         List<int[]> safeMoves = new ArrayList<>();
 
         for (int[] noObstacle : noObstacles) {
@@ -106,14 +104,14 @@ public class King extends Piece {
                     simulatedBoard[c][r] = boardData[c][r];
                 }
             }
-            simulatedBoard[column][row] = null;
+            simulatedBoard[kingColumn][kingRow] = null;
 //            simulatedBoard[targetColumn][targetRow] = this; // place king in new square
 
             // Step 2: check if that square is seen by any enemy piece
             boolean isSquareSeen = getIsSquareSeen(targetColumn, targetRow, !this.getIsWhite(), simulatedBoard);
             boolean isCastleThroughCheck = false;
-            if (Math.abs(targetColumn - column) == 2) {
-                isCastleThroughCheck = getIsSquareSeen((targetColumn + column )/ 2, targetRow, !this.getIsWhite(), simulatedBoard);
+            if (Math.abs(targetColumn - kingColumn) == 2) {
+                isCastleThroughCheck = getIsSquareSeen((targetColumn + kingColumn )/ 2, targetRow, !this.getIsWhite(), simulatedBoard);
             }
 
             // Step 3: if not seen, add to safeMoves
@@ -126,7 +124,7 @@ public class King extends Piece {
 
     /// ///////////////////////////////////////////////////////////////////////////////////////
 
-    private boolean getIsSquareSeen(int column, int row, boolean isWhiteAttack, Piece[][] simulatedBoardData) {
+    private boolean getIsSquareSeen(int targetColumn, int targetRow, boolean isWhiteAttack, Piece[][] simulatedBoardData) {
         // Used to check if a square is attacked by the opposing color (isWhiteAttack = attacker color)
 
         int[][] allDirections = {
@@ -136,8 +134,8 @@ public class King extends Piece {
 
         // --- Sliding pieces (Rooks, Bishops, Queens) ---
         for (int[] direction : allDirections) {
-            int scanColumn = column + direction[0];
-            int scanRow = row + direction[1];
+            int scanColumn = targetColumn + direction[0];
+            int scanRow = targetRow + direction[1];
 
             while (scanColumn >= 0 && scanColumn < 8 && scanRow >= 0 && scanRow < 8) {
                 Piece potentialAttacker = simulatedBoardData[scanColumn][scanRow];
@@ -165,8 +163,8 @@ public class King extends Piece {
         };
 
         for (int[] knightMove : allKnightMoves) {
-            int scanColumn = column + knightMove[0];
-            int scanRow = row + knightMove[1];
+            int scanColumn = targetColumn + knightMove[0];
+            int scanRow = targetRow + knightMove[1];
             if (scanColumn >= 0 && scanColumn < 8 && scanRow >= 0 && scanRow < 8) {
                 Piece maybeKnightAttacker = simulatedBoardData[scanColumn][scanRow];
                 if (maybeKnightAttacker != null &&
@@ -181,8 +179,8 @@ public class King extends Piece {
         for (int columnOffset = -1; columnOffset <= 1; columnOffset++) {
             for (int rowOffset = -1; rowOffset <= 1; rowOffset++) {
                 if (columnOffset == 0 && rowOffset == 0) continue;
-                int scanColumn = column + columnOffset;
-                int scanRow = row + rowOffset;
+                int scanColumn = targetColumn + columnOffset;
+                int scanRow = targetRow + rowOffset;
                 if (scanColumn >= 0 && scanColumn < 8 && scanRow >= 0 && scanRow < 8) {
                     Piece maybeKingAttacker = simulatedBoardData[scanColumn][scanRow];
                     if (maybeKingAttacker != null &&
@@ -195,19 +193,15 @@ public class King extends Piece {
         }
 
         // --- Pawn attacks ---
-        int pawnAttackDirection = ChessGUI.isWhitePovGlobal
-                ? (isWhiteAttack ? 1 : -1)
-                : (isWhiteAttack ? -1 : 1);
+        int pawnAttackDirection = ChessGUI.isWhitePovGlobal ? (isWhiteAttack ? 1 : -1) : (isWhiteAttack ? -1 : 1);
         int[][] pawnAttackOffsets = {{-1, pawnAttackDirection}, {1, pawnAttackDirection}};
 
         for (int[] pawnOffset : pawnAttackOffsets) {
-            int scanColumn = column + pawnOffset[0];
-            int scanRow = row + pawnOffset[1];
+            int scanColumn = targetColumn + pawnOffset[0];
+            int scanRow = targetRow + pawnOffset[1];
             if (scanColumn >= 0 && scanColumn < 8 && scanRow >= 0 && scanRow < 8) {
                 Piece maybePawnAttacker = simulatedBoardData[scanColumn][scanRow];
-                if (maybePawnAttacker != null &&
-                        maybePawnAttacker.getIsWhite() == isWhiteAttack &&
-                        maybePawnAttacker instanceof Pawn) {
+                if (maybePawnAttacker != null && maybePawnAttacker.getIsWhite() == isWhiteAttack && maybePawnAttacker instanceof Pawn) {
                     return true;
                 }
             }

@@ -10,7 +10,7 @@ public class Knight extends Piece {
     }
 
     @Override
-    public List<int[]> getCandidateMoves(int column, int row) {
+    public List<int[]> getCandidateMoves(int knightColumn, int knightRow) {
 //        System.out.println("This is a knight and candidate moves are actively being coded");
 
         List<int[]> candidateMoves = new ArrayList<>();
@@ -23,11 +23,12 @@ public class Knight extends Piece {
         };
 
         for (int[] thisHop : knightHops) {
-            int newRow = row + thisHop[0];
-            int newColumn = column + thisHop[1];
+            int moveColumn = knightColumn + thisHop[0];
+            int moveRow = knightRow + thisHop[1];
 
-            if (newRow >= 0 && newRow < 8 && newColumn >= 0 && newColumn < 8) {
-                candidateMoves.add(new int[]{newColumn, newRow});
+
+            if (moveColumn >= 0 && moveColumn < 8 && moveRow >= 0 && moveRow < 8) {
+                candidateMoves.add(new int[]{moveColumn, moveRow});
             }
         }
         return candidateMoves;

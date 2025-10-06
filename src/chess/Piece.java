@@ -30,35 +30,35 @@ public abstract class Piece {
                 {1, -1}, {1, 0}, {1, 1}
         };
         for (int[] direction : allDirections) {
-            int newColumn = column + direction[0];
-            int newRow = row + direction[1];
+            int moveColumn = column + direction[0];
+            int moveRow = row + direction[1];
 
             boolean isBlocked = false;
 
-            while (newColumn >= 0 && newColumn < 8 && newRow >= 0 && newRow < 8) {
-                Piece potentialBlocker = boardData[newColumn][newRow];
+            while (moveColumn >= 0 && moveColumn < 8 && moveRow >= 0 && moveRow < 8) {
+                Piece potentialBlocker = boardData[moveColumn][moveRow];
                 if (potentialBlocker != null && !isBlocked) {
-                    isBlocked = true; // doesn't check team kill
+                    isBlocked = true; // doesn't remove first blocker, instead checks team kill later
                 } else if (isBlocked) {
-                    blockedSquares.add(new int[]{newColumn, newRow}); //only added AFTER finding first block
+                    blockedSquares.add(new int[]{moveColumn, moveRow}); //only added AFTER finding first blocker
                 }
-                newColumn += direction[0];
-                newRow += direction[1];
+                moveColumn += direction[0];
+                moveRow += direction[1];
             }
         }
 
-        for (int[] possibleMove : candidateMoves) {
+        for (int[] candidateMove : candidateMoves) {
             boolean mightBeAdded = true;
             for (int[] blockedSquare : blockedSquares) { //filtering out blockedSquares from candidateMoves
-                if (possibleMove[0] == blockedSquare[0] && possibleMove[1] == blockedSquare[1]) {
+                if (candidateMove[0] == blockedSquare[0] && candidateMove[1] == blockedSquare[1]) {
                     mightBeAdded = false;
                     break;
                 }
             }
             if (mightBeAdded) { // isn't blocked
-                Piece maybeCapture = boardData[possibleMove[0]][possibleMove[1]];
+                Piece maybeCapture = boardData[candidateMove[0]][candidateMove[1]];
                 if (maybeCapture == null || maybeCapture.getIsWhite() != this.getIsWhite()) { // no teamkill
-                    noObstacles.add(possibleMove); // the big Added
+                    noObstacles.add(candidateMove); // the big Added
                 }
             }
         }
@@ -152,9 +152,8 @@ public abstract class Piece {
 
         if (isKingClosest && (isVerticalPin || isHorizontalPin || isDiagonalPin)) {
             for (int[] maybeOkPinnedMove : noObstacles) {
-                int newColumn = maybeOkPinnedMove[0], newRow = maybeOkPinnedMove[1];
-                int moveKingColumnOffset = newColumn - myKingColumn;
-                int moveKingRowOffset = newRow - myKingRow;
+                int moveKingColumnOffset = maybeOkPinnedMove[0] - myKingColumn;
+                int moveKingRowOffset = maybeOkPinnedMove[1] - myKingRow;
 
                 boolean allowed = false;
 

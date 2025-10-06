@@ -10,36 +10,28 @@ public class Pawn extends Piece {
     }
 
     @Override
-    public List<int[]> getCandidateMoves(int column, int row) {
-//        System.out.println("This is a Pawn and candidate possibleMoves are actively being coded");
-
+    public List<int[]> getCandidateMoves(int pawnColumn, int pawnRow) {
         List<int[]> candidateMoves = new ArrayList<>();
 
         int upOrDown = (getIsWhite() == ChessGUI.isWhitePovGlobal) ? -1 : 1;
 
-//        if(upOrDown == 1) {
-//            System.out.println("It's going down??");
-//        } else {
-//            System.out.println("It's going up?");
-//        }
-
-        // one possibleMove forward
-        int inFront = row + upOrDown;
+        // one candidateMove forward
+        int inFront = pawnRow + upOrDown;
         if (inFront >= 0 && inFront < 8) {
-            candidateMoves.add(new int[]{column, inFront});
+            candidateMoves.add(new int[]{pawnColumn, inFront});
 
             // double jumps
             int startingRow = (getIsWhite() == ChessGUI.isWhitePovGlobal) ? 6 : 1;
 
-            if (row == startingRow) {
-                int doubleInFront = row + (2 * upOrDown);
-                candidateMoves.add(new int[]{column, doubleInFront});
+            if (pawnRow == startingRow) {
+                int doubleInFront = pawnRow + (2 * upOrDown);
+                candidateMoves.add(new int[]{pawnColumn, doubleInFront});
             }
 
             // possible captures
-            int[] eitherSide = {column - 1, column + 1};
+            int[] eitherSide = {pawnColumn - 1, pawnColumn + 1};
             for (int side : eitherSide) {
-                if (inFront >= 0 && inFront < 8 && side >= 0 && side < 8) {
+                if (side >= 0 && side < 8) {
                     candidateMoves.add(new int[]{side, inFront});
                 }
             }
@@ -48,31 +40,30 @@ public class Pawn extends Piece {
     }
 
     @Override
-    public List<int[]> handleObstacles(int column, int row, Piece[][] boardData, List<int[]> candidateMoves) {
+    public List<int[]> handleObstacles(int pawnColumn, int pawnRow, Piece[][] boardData, List<int[]> candidateMoves) {
         List<int[]> noObstacles = new ArrayList<>();
 
-        for (int[] possibleMove : candidateMoves) {
-            int newColumn = possibleMove[0];
-            int newRow = possibleMove[1];
-            Piece target = boardData[newColumn][newRow];
+        for (int[] candidateMove : candidateMoves) {
+            int moveColumn = candidateMove[0];
+            int moveRow = candidateMove[1];
+            Piece targetSquarePiece = boardData[moveColumn][moveRow];
 
-            // Forward possibleMoves: must be empty
-            if (newColumn == column) {
-                if (target == null) {
+            // Forward candidateMoves: must be empty
+            if (moveColumn == pawnColumn) {
+                if (targetSquarePiece == null) {
                     // double jump: check both squares are clear
-                    if (Math.abs(newRow - row) == 2) {
-                        int midRow = (row + newRow) / 2;
-                        if (boardData[newColumn][midRow] == null) {
-                            noObstacles.add(possibleMove);
+                    if (Math.abs(moveRow - pawnRow) == 2) {
+                        if (boardData[moveColumn][(pawnRow + moveRow) / 2] == null) {
+                            noObstacles.add(candidateMove);
                         }
                     } else {
-                        noObstacles.add(possibleMove);
+                        noObstacles.add(candidateMove);
                     }
                 }
             }
             // Diagonal captures: must be enemy piece
-            else if (target != null && target.getIsWhite() != this.getIsWhite()) {
-                noObstacles.add(possibleMove);
+            else if (targetSquarePiece != null && targetSquarePiece.getIsWhite() != this.getIsWhite()) {
+                noObstacles.add(candidateMove);
             }
         }
         return noObstacles;

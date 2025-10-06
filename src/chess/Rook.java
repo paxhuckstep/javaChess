@@ -10,9 +10,7 @@ public class Rook extends Piece {
     }
 
     @Override
-    public List<int[]> getCandidateMoves(int column, int row) {
-//        System.out.println("This is a Rook and candidate moves are actively being coded");
-
+    public List<int[]> getCandidateMoves(int rookColumn, int rookRow) {
         List<int[]> candidateMoves = new ArrayList<>();
 
         int[][] straightDirections = {
@@ -22,21 +20,17 @@ public class Rook extends Piece {
                 {0, 1}
         };
 
-        for (int[] direction : straightDirections) {
-            int newColumn = column + direction[0];
-            int newRow = row + direction[1];
+        for (int[] straightDirection : straightDirections) {
+            int moveColumn = rookColumn + straightDirection[0];
+            int moveRow = rookRow + straightDirection[1];
 
+            while (moveRow >= 0 && moveRow < 8 && moveColumn >= 0 && moveColumn < 8) {
+                candidateMoves.add(new int[]{moveColumn, moveRow});
 
-            while (newRow >= 0 && newRow < 8 && newColumn >= 0 && newColumn < 8) {
-                candidateMoves.add(new int[]{newColumn, newRow});
-                newColumn += direction[0];
-                newRow += direction[1];
-
+                moveColumn += straightDirection[0];
+                moveRow += straightDirection[1];
             }
-
         }
         return candidateMoves;
-
     }
-
 }

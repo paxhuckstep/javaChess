@@ -10,7 +10,7 @@ public class Bishop extends Piece {
     }
 
     @Override
-    public List<int[]> getCandidateMoves(int column, int row) {
+    public List<int[]> getCandidateMoves(int bishopColumn, int bishopRow) {
 //        System.out.println("This is a bishop and candidate moves are actively being coded");
 
         List<int[]> candidateMoves = new ArrayList<>();
@@ -20,14 +20,14 @@ public class Bishop extends Piece {
                 {1, -1},  {1, 1}
         };
 
-        for (int[] direction : diagonalDirections) {
-            int newRow = row + direction[0];
-            int newColumn = column + direction[1];
+        for (int[] diagonalDirection : diagonalDirections) {
+            int moveRow = bishopRow + diagonalDirection[0];
+            int moveColumn = bishopColumn + diagonalDirection[1];
 
-            while (newRow >= 0 && newRow < 8 && newColumn >= 0 && newColumn < 8) {
-                candidateMoves.add(new int[]{newColumn, newRow});
-                newRow +=direction[0];
-                newColumn +=direction[1];
+            while (moveRow >= 0 && moveRow < 8 && moveColumn >= 0 && moveColumn < 8) {
+                candidateMoves.add(new int[]{moveColumn, moveRow});
+                moveRow +=diagonalDirection[0];
+                moveColumn +=diagonalDirection[1];
             }
 
         }

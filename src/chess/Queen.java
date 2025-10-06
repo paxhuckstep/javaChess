@@ -10,14 +10,14 @@ public class Queen extends Piece {
     }
 
     @Override
-    public List<int[]> getCandidateMoves(int column, int row) {
+    public List<int[]> getCandidateMoves(int queenColumn, int queenRow) {
         List<int[]> candidateMoves = new ArrayList<>();
 
         Rook queenStraights = new Rook(this.isWhite);
-        candidateMoves.addAll(queenStraights.getCandidateMoves(column, row));
+        candidateMoves.addAll(queenStraights.getCandidateMoves(queenColumn, queenRow));
 
         Bishop queenDiagonals = new Bishop(this.isWhite);
-        candidateMoves.addAll(queenDiagonals.getCandidateMoves(column, row));
+        candidateMoves.addAll(queenDiagonals.getCandidateMoves(queenColumn, queenRow));
 
         return candidateMoves;
     }

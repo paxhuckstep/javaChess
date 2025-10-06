@@ -66,9 +66,7 @@ public class Pawn extends Piece {
 
                             //en pessant
                             || ((candidateMove[0] == ChessGUI.enPessantColumn)
-                            && (ChessGUI.isWhitePovGlobal ? this.getIsWhite()
-                            ? pawnRow == 3 : pawnRow == 4 : this.getIsWhite()
-                            ? pawnRow == 4 : pawnRow == 3))) {
+                            && (pawnRow == (ChessGUI.isWhitePovGlobal == this.getIsWhite() ? 3 : 4) ) )) {
                 noObstacles.add(candidateMove);
             }
         }

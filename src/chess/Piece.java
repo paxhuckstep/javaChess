@@ -65,11 +65,11 @@ public abstract class Piece {
         return noObstacles;
     }
 
-    private int[] findMyKing(Piece[][] boardData) {
+    public static int[] findMyKing(Piece[][] boardData, boolean isWhite) {
         for (int maybeKingColumn = 0; maybeKingColumn < 8; maybeKingColumn++) {
             for (int maybeKingRow = 0; maybeKingRow < 8; maybeKingRow++) {
                 Piece maybeKing = boardData[maybeKingColumn][maybeKingRow];
-                if (maybeKing != null && maybeKing instanceof King && maybeKing.getIsWhite() == this.getIsWhite()) {
+                if (maybeKing != null && maybeKing instanceof King && maybeKing.getIsWhite() == isWhite) {
                     return new int[]{maybeKingColumn, maybeKingRow};
                 }
             }
@@ -79,7 +79,7 @@ public abstract class Piece {
     }
 
 
-    protected boolean getIsSquareSeen(int targetColumn, int targetRow, boolean isWhiteAttack, Piece[][] simulatedBoardData) {
+    public static boolean getIsSquareSeen(int targetColumn, int targetRow, boolean isWhiteAttack, Piece[][] simulatedBoardData) {
         // Used to check if a square is attacked by the opposing color (isWhiteAttack = attacker color)
 
         int[][] allDirections = {
@@ -169,7 +169,7 @@ public abstract class Piece {
 
         // Step 1: find my King
 
-        int[] myKingCoordinates = findMyKing(boardData);
+        int[] myKingCoordinates = findMyKing(boardData, this.getIsWhite());
 
         int myKingColumn = myKingCoordinates[0], myKingRow = myKingCoordinates[1];
 //
@@ -278,7 +278,7 @@ public abstract class Piece {
     public List<int[]> handleBlocksCheck(int pieceColumn, int pieceRow, Piece[][] boardData, List<int[]> noSelfCheckMoves) {
         List<int[]> blockingMoves = new ArrayList<>();
 
-        int[] myKingCoordinates = findMyKing(boardData);
+        int[] myKingCoordinates = findMyKing(boardData, this.getIsWhite());
         int kingColumn = myKingCoordinates[0];
         int kingRow = myKingCoordinates[1];
         if (kingColumn == -1) {

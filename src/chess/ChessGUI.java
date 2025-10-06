@@ -7,7 +7,8 @@ import java.util.List;
 
 public class ChessGUI extends JPanel {
     private ChessSquareButton[][] boardButtons = new ChessSquareButton[8][8];
-    private Piece[][] boardData = new Piece[8][8];
+    private Piece[][] boardData;
+    private boolean isWhiteTurn = true;
     public static boolean isWhitePovGlobal;
     private static Piece lastClickedPiece = null;
     public static int[] lastClickedSquare = new int[2];
@@ -24,7 +25,6 @@ public class ChessGUI extends JPanel {
         ChessGUI.isWhitePovGlobal = isWhitePov;
         setSize(600, 600);
         setLayout(new GridLayout(8, 8));
-//        Piece[][] boardData = StartingBoardData.getStartingBoardData(isWhitePov);
         boardData = StartingBoardData.getStartingBoardData(isWhitePov);
 
         for (int row = 0; row < 8; row++) {
@@ -52,6 +52,7 @@ public class ChessGUI extends JPanel {
                         //move piece
                         boardData[lastClickedSquare[0]][lastClickedSquare[1]] = null;
                         boardData[c][r] = lastClickedPiece;
+                        isWhiteTurn = !isWhiteTurn;
 
                         //EnPessant Rights Update
                         if (lastClickedPiece instanceof Pawn && Math.abs(r - lastClickedSquare[1]) == 2) {
@@ -152,8 +153,25 @@ public class ChessGUI extends JPanel {
                             }
                         }
 
+
                         // repaint
                         refreshBoard(boardData);
+
+                        //end of game check
+                        if (isStalemate()) {
+                            String endGameMessage = "";
+                            if (isCheck()) {
+                                if (isWhiteTurn) {
+                                    endGameMessage = "Black Wins by Checkmate!";
+                                } else {
+                                    endGameMessage = "White Wins by Checkmate!";
+                                }
+                            } else {
+                                endGameMessage = "Stalemate!";
+                            }
+                            JOptionPane.showMessageDialog(BigGUI.bigGuiReference, endGameMessage);
+                        }
+
 
                     } else { //clicked non-legal square
                         //Clean off old legal moves
@@ -163,7 +181,7 @@ public class ChessGUI extends JPanel {
                             }
                         }
                         Piece clickedPiece = boardData[c][r];
-                        if (clickedPiece != null) { // #GetMoves
+                        if (clickedPiece != null && clickedPiece.getIsWhite() == isWhiteTurn) { // #GetMoves
                             List<int[]> candidateMoves = clickedPiece.getCandidateMoves(c, r);
                             List<int[]> obstaclesHandled = clickedPiece.handleObstacles(c, r, boardData, candidateMoves);
                             List<int[]> noSelfChecks = clickedPiece.handleNoSelfChecks(c, r, boardData, obstaclesHandled);
@@ -212,16 +230,17 @@ public class ChessGUI extends JPanel {
         bottomLeftRookMoved = false;
         bottomRightRookMoved = false;
         enPessantColumn = -1;
+        isWhiteTurn = true;
 
         boardData = resetBoardData;
         refreshBoard(resetBoardData);
     }
 
     public void flipBoard() {
-        Piece[][]  flippedBoardData = new Piece[8][8];
+        Piece[][] flippedBoardData = new Piece[8][8];
         for (int column = 0; column < 8; column++) {
             for (int row = 0; row < 8; row++) {
-                flippedBoardData[column][row] = boardData[7-column][7 - row];
+                flippedBoardData[column][row] = boardData[7 - column][7 - row];
             }
         }
         boolean oldTopKingMoved = topKingMoved;
@@ -241,6 +260,30 @@ public class ChessGUI extends JPanel {
         refreshBoard(flippedBoardData);
 
     }
+
+    private boolean isStalemate() {
+        for (int c = 0; c < 8; c++) {
+            for (int r = 0; r < 8; r++) {
+                Piece piece = boardData[c][r];
+                if (piece != null && piece.getIsWhite() == isWhiteTurn) {
+                    List<int[]> candidateMoves = piece.getCandidateMoves(c, r);
+                    List<int[]> obstaclesHandled = piece.handleObstacles(c, r, boardData, candidateMoves);
+                    List<int[]> noSelfChecks = piece.handleNoSelfChecks(c, r, boardData, obstaclesHandled);
+                    List<int[]> legalMoves = piece.handleBlocksCheck(c, r, boardData, noSelfChecks);
+                    if (!legalMoves.isEmpty()) return false; // has a move → not stalemate
+                }
+            }
+        }
+        return true;
+    }
+
+    private boolean isCheck() {
+        int[] kingCoordinates = Piece.findMyKing(boardData, isWhiteTurn);
+        if (kingCoordinates[0] == -1) return false; // no king found
+
+        return Piece.getIsSquareSeen(kingCoordinates[0], kingCoordinates[1], !isWhiteTurn, boardData);
+    }
+
 
     private void updateSquareIcon(ChessSquareButton square, Piece piece) {
         if (piece != null) {

@@ -18,7 +18,7 @@ public class BigGUI extends JFrame {
         setLayout(new BorderLayout());
 
         // Create chessboard
-        chessBoard = new ChessGUI(Color.WHITE, Color.lightGray, true);
+        chessBoard = new ChessGUI(Color.WHITE, Color.lightGray, false);
 
         // Create buttons
         JButton resetButton = new JButton("Reset");
@@ -34,10 +34,10 @@ public class BigGUI extends JFrame {
 
         // Example button action (you’ll hook these up later)
         resetButton.addActionListener(e -> {
-            System.out.println("Reset clicked!");
+            chessBoard.resetBoardData();
         });
         flipButton.addActionListener(e -> {
-            System.out.println("Flip clicked!");
+            chessBoard.flipBoard();
         });
     }
 }

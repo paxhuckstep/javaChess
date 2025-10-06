@@ -7,6 +7,7 @@ import java.util.List;
 
 public class ChessGUI extends JPanel {
     private ChessSquareButton[][] boardButtons = new ChessSquareButton[8][8];
+    private Piece[][] boardData = new Piece[8][8];
     public static boolean isWhitePovGlobal;
     private static Piece lastClickedPiece = null;
     public static int[] lastClickedSquare = new int[2];
@@ -23,7 +24,8 @@ public class ChessGUI extends JPanel {
         ChessGUI.isWhitePovGlobal = isWhitePov;
         setSize(600, 600);
         setLayout(new GridLayout(8, 8));
-        Piece[][] boardData = StartingBoardData.getStartingBoardData(isWhitePov);
+//        Piece[][] boardData = StartingBoardData.getStartingBoardData(isWhitePov);
+        boardData = StartingBoardData.getStartingBoardData(isWhitePov);
 
         for (int row = 0; row < 8; row++) {
             for (int column = 0; column < 8; column++) {
@@ -44,7 +46,7 @@ public class ChessGUI extends JPanel {
 
                         //handle EnPessant capture
                         if (lastClickedPiece instanceof Pawn && lastClickedSquare[0] != c && boardData[c][r] == null) {
-                            boardData[c][r - (isWhitePovGlobal == lastClickedPiece.getIsWhite() ? - 1 : 1)] = null;
+                            boardData[c][r - (isWhitePovGlobal == lastClickedPiece.getIsWhite() ? -1 : 1)] = null;
                         }
 
                         //move piece
@@ -134,10 +136,18 @@ public class ChessGUI extends JPanel {
                             String promotionPiece = PromotionGUI.openPromotionPopup(BigGUI.bigGuiReference, lastClickedPiece.getIsWhite());
                             if (promotionPiece != null) {
                                 switch (promotionPiece) {
-                                    case "queen":  boardData[c][r] = new Queen(lastClickedPiece.getIsWhite()); break;
-                                    case "rook":   boardData[c][r] = new Rook(lastClickedPiece.getIsWhite()); break;
-                                    case "bishop": boardData[c][r] = new Bishop(lastClickedPiece.getIsWhite()); break;
-                                    case "knight": boardData[c][r] = new Knight(lastClickedPiece.getIsWhite()); break;
+                                    case "queen":
+                                        boardData[c][r] = new Queen(lastClickedPiece.getIsWhite());
+                                        break;
+                                    case "rook":
+                                        boardData[c][r] = new Rook(lastClickedPiece.getIsWhite());
+                                        break;
+                                    case "bishop":
+                                        boardData[c][r] = new Bishop(lastClickedPiece.getIsWhite());
+                                        break;
+                                    case "knight":
+                                        boardData[c][r] = new Knight(lastClickedPiece.getIsWhite());
+                                        break;
                                 }
                             }
                         }
@@ -185,6 +195,51 @@ public class ChessGUI extends JPanel {
         }
         revalidate();
         repaint();
+    }
+
+    public void resetBoardData() {
+        Piece[][] resetBoardData = StartingBoardData.getStartingBoardData(isWhitePovGlobal);
+
+        for (int resetColumn = 0; resetColumn < 8; resetColumn++) {
+            for (int resetRow = 2; resetRow < 6; resetRow++) {
+                resetBoardData[resetColumn][resetRow] = null;
+            }
+        }
+        topKingMoved = false;
+        bottomKingMoved = false;
+        topLeftRookMoved = false;
+        topRightRookMoved = false;
+        bottomLeftRookMoved = false;
+        bottomRightRookMoved = false;
+        enPessantColumn = -1;
+
+        boardData = resetBoardData;
+        refreshBoard(resetBoardData);
+    }
+
+    public void flipBoard() {
+        Piece[][]  flippedBoardData = new Piece[8][8];
+        for (int column = 0; column < 8; column++) {
+            for (int row = 0; row < 8; row++) {
+                flippedBoardData[column][row] = boardData[7-column][7 - row];
+            }
+        }
+        boolean oldTopKingMoved = topKingMoved;
+        boolean oldTopLeftRookMoved = topLeftRookMoved;
+        boolean oldTopRightRookMoved = topRightRookMoved;
+        topKingMoved = bottomKingMoved;
+        topLeftRookMoved = bottomRightRookMoved;
+        topRightRookMoved = bottomLeftRookMoved;
+        bottomKingMoved = oldTopKingMoved;
+        bottomLeftRookMoved = oldTopRightRookMoved;
+        bottomRightRookMoved = oldTopLeftRookMoved;
+
+        isWhitePovGlobal = !isWhitePovGlobal;
+        enPessantColumn = 7 - enPessantColumn;
+
+        boardData = flippedBoardData;
+        refreshBoard(flippedBoardData);
+
     }
 
     private void updateSquareIcon(ChessSquareButton square, Piece piece) {

@@ -278,7 +278,6 @@ public abstract class Piece {
     public List<int[]> handleBlocksCheck(int pieceColumn, int pieceRow, Piece[][] boardData, List<int[]> noSelfCheckMoves) {
         List<int[]> blockingMoves = new ArrayList<>();
 
-        // Step 1: find my king
         int[] myKingCoordinates = findMyKing(boardData);
         int kingColumn = myKingCoordinates[0];
         int kingRow = myKingCoordinates[1];
@@ -287,32 +286,26 @@ public abstract class Piece {
             return noSelfCheckMoves;
         }
 
-        boolean isInCheck = getIsSquareSeen(kingColumn, kingRow, !this.getIsWhite(), boardData);
-
-        if (!isInCheck) {
+        if (!getIsSquareSeen(kingColumn, kingRow, !this.getIsWhite(), boardData)) { // is not in check
             return noSelfCheckMoves;
         }
 
         for (int[] noSelfCheckMove : noSelfCheckMoves) {
+
             Piece[][] simulatedBoard = new Piece[8][8];
             for (int c = 0; c < 8; c++) {
                 for (int r = 0; r < 8; r++) {
                     simulatedBoard[c][r] = boardData[c][r];
                 }
             }
+
             simulatedBoard[noSelfCheckMove[0]][noSelfCheckMove[1]] = this;
             simulatedBoard[pieceColumn][pieceRow] = null;
-            boolean isStillInCheck = getIsSquareSeen(kingColumn, kingRow, !this.getIsWhite(), simulatedBoard);
-            if (!isStillInCheck) {
+
+            if (!getIsSquareSeen(kingColumn, kingRow, !this.getIsWhite(), simulatedBoard)) { // is now not in check
                 blockingMoves.add(noSelfCheckMove);
             }
         }
-
-
         return blockingMoves;
-
     }
-
 }
-
-

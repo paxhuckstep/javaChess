@@ -4,7 +4,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 
-
 public class ChessGUI extends JPanel {
     private ChessSquareButton[][] boardButtons = new ChessSquareButton[8][8];
     private Piece[][] boardData;
@@ -13,7 +12,7 @@ public class ChessGUI extends JPanel {
     private static Piece lastClickedPiece = null;
     public static int[] lastClickedSquare = new int[2];
     public static int enPessantColumn = -1;
-    private static int hundredHalfMoveCount;
+    private static int halfMoveCount;
 
     public static boolean topLeftRookMoved = false;
     public static boolean topRightRookMoved = false;
@@ -43,19 +42,18 @@ public class ChessGUI extends JPanel {
                 int c = column;
                 int r = row;
                 squareButton.addActionListener(e -> {
-                    if (boardButtons[c][r].getIsLegal()) { // is a legal move
+                    if (boardButtons[c][r].getIsLegal()) { // We're moving a piece
 
-                        //handle EnPessant capture
+                        //handle En Pessant capture
                         if (lastClickedPiece instanceof Pawn && lastClickedSquare[0] != c && boardData[c][r] == null) {
                             boardData[c][r - (isWhitePovGlobal == lastClickedPiece.getIsWhite() ? -1 : 1)] = null;
                         }
-
+                        //"50 move rule" counter
                         if (lastClickedPiece instanceof Pawn || boardData[c][r] != null) {
-                            hundredHalfMoveCount = 0;
+                            halfMoveCount = 0;
                         } else {
-                            hundredHalfMoveCount++;
+                            halfMoveCount++;
                         }
-
                         //move piece
                         boardData[lastClickedSquare[0]][lastClickedSquare[1]] = null;
                         boardData[c][r] = lastClickedPiece;
@@ -88,49 +86,45 @@ public class ChessGUI extends JPanel {
                         // Handle castling rook movement
                         if (lastClickedPiece instanceof King) {
                             int previousRow = lastClickedSquare[1];
-                            // Bottom side castling
                             if (previousRow == 7) {
-                                if (isWhitePovGlobal) { // White POV (king starts col 4)
-                                    if (c == 6) { // short castle
-                                        boardData[5][7] = boardData[7][7]; // move rook
+                                if (isWhitePovGlobal) {
+                                    if (c == 6) {
+                                        boardData[5][7] = boardData[7][7];
                                         boardData[7][7] = null;
                                         bottomRightRookMoved = true;
-                                    } else if (c == 2) { // long castle
+                                    } else if (c == 2) {
                                         boardData[3][7] = boardData[0][7];
                                         boardData[0][7] = null;
                                         bottomLeftRookMoved = true;
                                     }
-                                } else { // Black POV (king starts col 3)
-                                    if (c == 1) { // short castle
+                                } else {
+                                    if (c == 1) {
                                         boardData[2][7] = boardData[0][7];
                                         boardData[0][7] = null;
                                         bottomLeftRookMoved = true;
-                                    } else if (c == 5) { // long castle
+                                    } else if (c == 5) {
                                         boardData[4][7] = boardData[7][7];
                                         boardData[7][7] = null;
                                         bottomRightRookMoved = true;
                                     }
                                 }
-                            }
-
-                            // Top side castling
-                            else if (previousRow == 0) {
-                                if (isWhitePovGlobal) { // White POV (king starts col 4)
-                                    if (c == 6) { // short castle
+                            } else if (previousRow == 0) {
+                                if (isWhitePovGlobal) {
+                                    if (c == 6) {
                                         boardData[5][0] = boardData[7][0];
                                         boardData[7][0] = null;
                                         topRightRookMoved = true;
-                                    } else if (c == 2) { // long castle
+                                    } else if (c == 2) {
                                         boardData[3][0] = boardData[0][0];
                                         boardData[0][0] = null;
                                         topLeftRookMoved = true;
                                     }
-                                } else { // Black POV (king starts col 3)
-                                    if (c == 1) { // short castle
+                                } else {
+                                    if (c == 1) {
                                         boardData[2][0] = boardData[0][0];
                                         boardData[0][0] = null;
                                         topLeftRookMoved = true;
-                                    } else if (c == 5) { // long castle
+                                    } else if (c == 5) {
                                         boardData[4][0] = boardData[7][0];
                                         boardData[7][0] = null;
                                         topRightRookMoved = true;
@@ -142,29 +136,26 @@ public class ChessGUI extends JPanel {
                         //handlePromotion
                         if (lastClickedPiece instanceof Pawn && (r == 0 || r == 7)) {
                             String promotionPiece = PromotionGUI.openPromotionPopup(BigGUI.bigGuiReference, lastClickedPiece.getIsWhite());
-                            if (promotionPiece != null) {
-                                switch (promotionPiece) {
-                                    case "queen":
-                                        boardData[c][r] = new Queen(lastClickedPiece.getIsWhite());
-                                        break;
-                                    case "rook":
-                                        boardData[c][r] = new Rook(lastClickedPiece.getIsWhite());
-                                        break;
-                                    case "bishop":
-                                        boardData[c][r] = new Bishop(lastClickedPiece.getIsWhite());
-                                        break;
-                                    case "knight":
-                                        boardData[c][r] = new Knight(lastClickedPiece.getIsWhite());
-                                        break;
-                                }
+                            switch (promotionPiece) {
+                                case "queen":
+                                    boardData[c][r] = new Queen(lastClickedPiece.getIsWhite());
+                                    break;
+                                case "rook":
+                                    boardData[c][r] = new Rook(lastClickedPiece.getIsWhite());
+                                    break;
+                                case "bishop":
+                                    boardData[c][r] = new Bishop(lastClickedPiece.getIsWhite());
+                                    break;
+                                case "knight":
+                                    boardData[c][r] = new Knight(lastClickedPiece.getIsWhite());
+                                    break;
                             }
                         }
-
 
                         // repaint
                         refreshBoard(boardData);
 
-                        //end of game check
+                        // end of game check
                         if (isStalemate()) {
                             String endGameMessage;
                             if (isCheck()) {
@@ -177,29 +168,30 @@ public class ChessGUI extends JPanel {
                                 endGameMessage = "Stalemate!";
                             }
                             JOptionPane.showMessageDialog(BigGUI.bigGuiReference, endGameMessage);
-                        } else if (hundredHalfMoveCount == 100) {
+                        } else if (halfMoveCount == 100) {
                             JOptionPane.showMessageDialog(BigGUI.bigGuiReference, "Draw, 50 move rule");
                         }
 
-
-                    } else { //clicked non-legal square
-                        //Clean off old legal moves
+                    } else { // Clicked non-legal square (Not moving a piece)
+                        // Clean off old legal moves
                         for (ChessSquareButton[] cleanRow : boardButtons) {
                             for (ChessSquareButton button : cleanRow) {
                                 button.setIsLegal(false);
                             }
                         }
+                        // See if clicked piece
                         Piece clickedPiece = boardData[c][r];
-                        if (clickedPiece != null && clickedPiece.getIsWhite() == isWhiteTurn && hundredHalfMoveCount < 100) { // #GetMoves
+                        if (clickedPiece != null && clickedPiece.getIsWhite() == isWhiteTurn && halfMoveCount < 100) { // #GetMoves
                             List<int[]> candidateMoves = clickedPiece.getCandidateMoves(c, r);
                             List<int[]> obstaclesHandled = clickedPiece.handleObstacles(c, r, boardData, candidateMoves);
                             List<int[]> noSelfChecks = clickedPiece.handleNoSelfChecks(c, r, boardData, obstaclesHandled);
                             List<int[]> legalMoves = clickedPiece.handleBlocksCheck(c, r, boardData, noSelfChecks);
-
+                            // Show legal moves
                             for (int[] legalMove : legalMoves) {
                                 boardButtons[legalMove[0]][legalMove[1]].setIsLegal(true);
                             }
                         }
+                        // Store what piece we're showing legal moves for
                         lastClickedPiece = clickedPiece;
                         lastClickedSquare = new int[]{c, r};
                     }
@@ -211,6 +203,7 @@ public class ChessGUI extends JPanel {
         refreshBoard(boardData);
     }
 
+    //update the ChessGUI with latest boardData
     public void refreshBoard(Piece[][] boardData) {
         for (int row = 0; row < 8; row++) {
             for (int column = 0; column < 8; column++) {
@@ -224,7 +217,7 @@ public class ChessGUI extends JPanel {
         repaint();
     }
 
-    public void resetBoardData() {
+    public void resetGame() { // Start a new game
         Piece[][] resetBoardData = StartingBoardData.getStartingBoardData(isWhitePovGlobal);
 
         for (int resetColumn = 0; resetColumn < 8; resetColumn++) {
@@ -240,13 +233,13 @@ public class ChessGUI extends JPanel {
         bottomRightRookMoved = false;
         enPessantColumn = -1;
         isWhiteTurn = true;
-        hundredHalfMoveCount = 0;
+        halfMoveCount = 0;
 
         boardData = resetBoardData;
         refreshBoard(resetBoardData);
     }
 
-    public void flipBoard() {
+    public void flipBoard() { // change pov from white to black or black to white.
         Piece[][] flippedBoardData = new Piece[8][8];
         for (int column = 0; column < 8; column++) {
             for (int row = 0; row < 8; row++) {
@@ -268,7 +261,6 @@ public class ChessGUI extends JPanel {
 
         boardData = flippedBoardData;
         refreshBoard(flippedBoardData);
-
     }
 
     private boolean isStalemate() {
@@ -287,15 +279,14 @@ public class ChessGUI extends JPanel {
         return true;
     }
 
-    private boolean isCheck() {
+    private boolean isCheck() { //distinguishes stalemate and checkmate
         int[] kingCoordinates = Piece.findMyKing(boardData, isWhiteTurn);
         if (kingCoordinates[0] == -1) return false; // no king found
 
         return Piece.getIsSquareSeen(kingCoordinates[0], kingCoordinates[1], !isWhiteTurn, boardData);
     }
 
-
-    private void updateSquareIcon(ChessSquareButton square, Piece piece) {
+    private void updateSquareIcon(ChessSquareButton square, Piece piece) { // show picture of piece on square
         if (piece != null) {
             String color = piece.getIsWhite() ? "white" : "black";
             String name = piece.getClass().getSimpleName().toLowerCase();

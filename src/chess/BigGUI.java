@@ -3,10 +3,8 @@ package chess;
 import javax.swing.*;
 import java.awt.*;
 
-
-
 public class BigGUI extends JFrame {
-    private ChessGUI chessBoard;
+    private final ChessGUI chessBoard;
     public static JFrame bigGuiReference;
 
     public BigGUI() {
@@ -21,7 +19,7 @@ public class BigGUI extends JFrame {
         chessBoard = new ChessGUI(Color.WHITE, Color.lightGray, true);
 
         // Create buttons
-        JButton resetButton = new JButton("Reset");
+        JButton resetButton = new JButton("New Game");
         JButton flipButton = new JButton("Flip Board");
 
         JPanel buttonPanel = new JPanel();
@@ -32,9 +30,8 @@ public class BigGUI extends JFrame {
         add(chessBoard, BorderLayout.CENTER);
         add(buttonPanel, BorderLayout.SOUTH);
 
-        // Example button action (you’ll hook these up later)
         resetButton.addActionListener(e -> {
-            chessBoard.resetBoardData();
+            chessBoard.resetGame();
         });
         flipButton.addActionListener(e -> {
             chessBoard.flipBoard();

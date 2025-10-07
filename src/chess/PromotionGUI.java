@@ -35,7 +35,6 @@ private void addPromotionButton(String pieceType, boolean isWhite) {
     add(button);
 }
 
-
     public String getSelectedPiece() {
         return selectedPiece;
     }

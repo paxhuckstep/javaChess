@@ -2,7 +2,6 @@ package chess;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.RecursiveTask;
 
 public class King extends Piece {
 
@@ -12,8 +11,6 @@ public class King extends Piece {
 
     @Override
     public List<int[]> getCandidateMoves(int kingColumn, int kingRow) {
-//        System.out.println("This is a King and candidate moves are actively being coded");
-
         List<int[]> candidateMoves = new ArrayList<>();
 
         int[][] allDirections = {
@@ -22,100 +19,87 @@ public class King extends Piece {
                 {1, -1}, {1, 0}, {1, 1}
         };
 
-        for (int[] directionection : allDirections) {
-            int newRow = kingRow + directionection[0];
-            int newColumn = kingColumn + directionection[1];
-
-            if (newRow >= 0 && newRow < 8 && newColumn >= 0 && newColumn < 8) {
-                candidateMoves.add(new int[]{newColumn, newRow});
+        for (int[] direction : allDirections) {
+            int moveRow = kingRow + direction[0];
+            int moveColumn = kingColumn + direction[1];
+            if (moveRow >= 0 && moveRow < 8 && moveColumn >= 0 && moveColumn < 8) {
+                candidateMoves.add(new int[]{moveColumn, moveRow});
             }
-
         }
         return candidateMoves;
     }
 
     @Override
     public List<int[]> handleObstacles(int kingColumn, int kingRow, Piece[][] boardData, List<int[]> candidateMoves) {
-        List<int[]> noObstacles = super.handleObstacles(kingColumn, kingRow, boardData, candidateMoves);
+        //adds maybeCanCastle Squares. the pov changes things a lot
+        List<int[]> maybeCanCastle = super.handleObstacles(kingColumn, kingRow, boardData, candidateMoves);
 
         boolean isTopKing = (kingRow == 0);
         boolean isBottomKing = (kingRow == 7);
 
-        // Handle bottom king (row 7)
+        // handles Bottom King
         if (isBottomKing && !ChessGUI.bottomKingMoved) {
-            if (ChessGUI.isWhitePovGlobal) { // White POV (bottom king at column 4)
-                // Short castle: king -> (6,7), requires columns 5,6 empty
+            if (ChessGUI.isWhitePovGlobal) { // Bottom King && White POV
                 if (!ChessGUI.bottomRightRookMoved && boardData[5][7] == null && boardData[6][7] == null) {
-                    noObstacles.add(new int[]{6, 7});
+                    maybeCanCastle.add(new int[]{6, 7});
                 }
-                // Long castle: king -> (2,7), requires columns 1,2,3 empty
                 if (!ChessGUI.bottomLeftRookMoved && boardData[1][7] == null && boardData[2][7] == null && boardData[3][7] == null) {
-                    noObstacles.add(new int[]{2, 7});
+                    maybeCanCastle.add(new int[]{2, 7});
                 }
-            } else { // Black POV (bottom king at column 3)
-                // Short castle: king -> (1,7), requires columns 1,2 empty
+            } else { // Bottom King && Black POV
                 if (!ChessGUI.bottomLeftRookMoved && boardData[1][7] == null && boardData[2][7] == null) {
-                    noObstacles.add(new int[]{1, 7});
+                    maybeCanCastle.add(new int[]{1, 7});
                 }
-                // Long castle: king -> (5,7), requires columns 4,5,6 empty
                 if (!ChessGUI.bottomRightRookMoved && boardData[4][7] == null && boardData[5][7] == null && boardData[6][7] == null) {
-                    noObstacles.add(new int[]{5, 7});
+                    maybeCanCastle.add(new int[]{5, 7});
                 }
             }
         }
-
-        // Handle top king (row 0)
+        // Handle top king
         else if (isTopKing && !ChessGUI.topKingMoved) {
-            if (ChessGUI.isWhitePovGlobal) { // White POV (top king at column 4)
-                // Short castle: king -> (6,0), requires columns 5,6 empty
+            if (ChessGUI.isWhitePovGlobal) { // Top King && White POV
                 if (!ChessGUI.topRightRookMoved && boardData[5][0] == null && boardData[6][0] == null) {
-                    noObstacles.add(new int[]{6, 0});
+                    maybeCanCastle.add(new int[]{6, 0});
                 }
-                // Long castle: king -> (2,0), requires columns 1,2,3 empty
                 if (!ChessGUI.topLeftRookMoved && boardData[1][0] == null && boardData[2][0] == null && boardData[3][0] == null) {
-                    noObstacles.add(new int[]{2, 0});
+                    maybeCanCastle.add(new int[]{2, 0});
                 }
-            } else { // Black POV (top king at column 3)
-                // Short castle: king -> (1,0), requires columns 1,2 empty
+            } else { // Top King && Black POV
                 if (!ChessGUI.topLeftRookMoved && boardData[1][0] == null && boardData[2][0] == null) {
-                    noObstacles.add(new int[]{1, 0});
+                    maybeCanCastle.add(new int[]{1, 0});
                 }
-                // Long castle: king -> (5,0), requires columns 4,5,6 empty
                 if (!ChessGUI.topRightRookMoved && boardData[4][0] == null && boardData[5][0] == null && boardData[6][0] == null) {
-                    noObstacles.add(new int[]{5, 0});
+                    maybeCanCastle.add(new int[]{5, 0});
                 }
             }
         }
-        return noObstacles;
+        return maybeCanCastle;
     }
 
     @Override
     public List<int[]> handleNoSelfChecks(int kingColumn, int kingRow, Piece[][] boardData, List<int[]> noObstacles) {
+       // King doesn't walk in to check logic
         List<int[]> safeMoves = new ArrayList<>();
-
         for (int[] noObstacle : noObstacles) {
 
-            int targetColumn = noObstacle[0];
-            int targetRow = noObstacle[1];
+            int moveColumn = noObstacle[0];
+            int moveRow = noObstacle[1];
 
-            // Step 1: make a simulated board for this move
+            // make a simulated board, so we can make king invisible (won't block attacker's vision itself)
             Piece[][] simulatedBoard = new Piece[8][8];
             for (int c = 0; c < 8; c++) {
-                for (int r = 0; r < 8; r++) {
-                    simulatedBoard[c][r] = boardData[c][r];
-                }
+                System.arraycopy(boardData[c], 0, simulatedBoard[c], 0, 8);
             }
             simulatedBoard[kingColumn][kingRow] = null;
-//            simulatedBoard[targetColumn][targetRow] = this; // place king in new square
 
-            // Step 2: check if that square is seen by any enemy piece
-            boolean isSquareSeen = getIsSquareSeen(targetColumn, targetRow, !this.getIsWhite(), simulatedBoard);
+            // See if square is safe
+            boolean isSquareSeen = getIsSquareSeen(moveColumn, moveRow, !this.getIsWhite(), simulatedBoard);
             boolean isCastleThroughCheck = false;
-            if (Math.abs(targetColumn - kingColumn) == 2) {
-                isCastleThroughCheck = getIsSquareSeen((targetColumn + kingColumn) / 2, targetRow, !this.getIsWhite(), simulatedBoard);
+            if (Math.abs(moveColumn - kingColumn) == 2) { // little extra to prevent castling through check
+                isCastleThroughCheck = getIsSquareSeen((moveColumn + kingColumn) / 2, moveRow, !this.getIsWhite(), simulatedBoard);
             }
 
-            // Step 3: if not seen, add to safeMoves
+            //  if not seen, add to safeMoves
             if (!isSquareSeen && !isCastleThroughCheck) {
                 safeMoves.add(noObstacle);
             }

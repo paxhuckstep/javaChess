@@ -15,7 +15,7 @@ public class Pawn extends Piece {
 
         int upOrDown = (getIsWhite() == ChessGUI.isWhitePovGlobal) ? -1 : 1;
 
-        // one candidateMove forward
+        // one square forward
         int inFront = pawnRow + upOrDown;
         if (inFront >= 0 && inFront < 8) {
             candidateMoves.add(new int[]{pawnColumn, inFront});
@@ -39,7 +39,7 @@ public class Pawn extends Piece {
         return candidateMoves;
     }
 
-    @Override
+    @Override // only time this gets overwritten completely!
     public List<int[]> handleObstacles(int pawnColumn, int pawnRow, Piece[][] boardData, List<int[]> candidateMoves) {
         List<int[]> noObstacles = new ArrayList<>();
 
@@ -48,7 +48,7 @@ public class Pawn extends Piece {
             int moveRow = candidateMove[1];
             Piece targetSquarePiece = boardData[moveColumn][moveRow];
 
-            // Forward candidateMoves: must be empty
+            // Forward squares must be free
             if (moveColumn == pawnColumn) {
                 if (targetSquarePiece == null) {
                     // double jump: check both squares are clear

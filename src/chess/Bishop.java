@@ -11,8 +11,6 @@ public class Bishop extends Piece {
 
     @Override
     public List<int[]> getCandidateMoves(int bishopColumn, int bishopRow) {
-//        System.out.println("This is a bishop and candidate moves are actively being coded");
-
         List<int[]> candidateMoves = new ArrayList<>();
 
         int[][] diagonalDirections = {
@@ -29,10 +27,7 @@ public class Bishop extends Piece {
                 moveRow +=diagonalDirection[0];
                 moveColumn +=diagonalDirection[1];
             }
-
         }
         return candidateMoves;
-
     }
-
 }

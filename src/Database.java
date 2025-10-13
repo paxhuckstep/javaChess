@@ -1,29 +1,40 @@
 package chess;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class Database {
     private static final String URL = "jdbc:sqlite:chess_game.db";
 
-    public static Connection connect() {
-        try {
-            return DriverManager.getConnection(URL);
+    public static void createMovesTable() {
+        String statementStringCreate = "CREATE TABLE IF NOT EXISTS moves (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "opening_name TEXT," +
+                "move_text TEXT" +
+                ");";
+
+        try (Connection connected = DriverManager.getConnection(URL);
+             Statement sqlStatement = connected.createStatement()) {
+            sqlStatement.execute(statementStringCreate);
+            System.out.println("Moves table ready.");
         } catch (SQLException e) {
             e.printStackTrace();
-            return null;
         }
     }
 
-    // quick test
-//    public static void main(String[] args) {
-//        try (Connection conn = connect()) {
-//            if (conn != null) {
-//                System.out.println("Connected to SQLite!");
-//            }
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
-//    }
+
+
+    public static void saveMove(String openingName, String move) {
+        String statementStringSave = "INSERT INTO moves(opening_name, move_text) VALUES(?, ?)";
+
+        try (Connection connected = DriverManager.getConnection(URL);
+             PreparedStatement sqlStatement = connected.prepareStatement(statementStringSave)) {
+
+            sqlStatement.setString(1, openingName);
+            sqlStatement.setString(2, move);
+            sqlStatement.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }

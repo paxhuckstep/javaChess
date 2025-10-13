@@ -3,8 +3,11 @@ package chess;
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
+import java.util.ArrayList;
+
 
 public class ChessGUI extends JPanel {
+    private final List<String> moveHistory = new ArrayList<>();
     private ChessSquareButton[][] boardButtons = new ChessSquareButton[8][8];
     private Piece[][] boardData;
     private boolean isWhiteTurn = true;
@@ -57,7 +60,35 @@ public class ChessGUI extends JPanel {
                         //move piece
                         boardData[lastClickedSquare[0]][lastClickedSquare[1]] = null;
                         boardData[c][r] = lastClickedPiece;
+
+
+
+
+
+
+
+
+                        int moveStartColumn = isWhitePovGlobal ? lastClickedSquare[0] : 7 - lastClickedSquare[0];
+                        int moveStartRow = isWhitePovGlobal ? lastClickedSquare[1] : 7 - lastClickedSquare[1];
+                        int moveEndCol   = isWhitePovGlobal ? c : 7 - c;
+                        int moveEndRow   = isWhitePovGlobal ? r : 7 - r;
+
+                        String moveNotation = String.format("%c%d to %c%d",
+                                'a' + moveStartColumn, 8 - moveStartRow,
+                                'a' + moveEndCol, 8 - moveEndRow);
+
+                        moveHistory.add(moveNotation);
+                        System.out.println("Move recorded: " + moveNotation);
+
+
+
+
+
+
+
+
                         isWhiteTurn = !isWhiteTurn;
+
 
                         //EnPessant Rights Update
                         if (lastClickedPiece instanceof Pawn && Math.abs(r - lastClickedSquare[1]) == 2) {

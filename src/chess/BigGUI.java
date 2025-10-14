@@ -18,6 +18,10 @@ public class BigGUI extends JFrame {
         // Create chessboard
         chessBoard = new ChessGUI(Color.WHITE, Color.lightGray, true);
 
+        //Create Database
+
+        chess.Database.createMovesTable();
+
         // Create buttons
         JButton resetButton = new JButton("New Game");
         JButton flipButton = new JButton("Flip Board");

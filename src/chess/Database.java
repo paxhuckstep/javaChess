@@ -3,7 +3,7 @@ package chess;
 import java.sql.*;
 
 public class Database {
-    private static final String URL = "jdbc:sqlite:chess_game.db";
+    private static final String URL = "jdbc:sqlite:C:/Users/paxhu/IdeaProjects/ChessAppJava/chess_game.db";
 
     public static void createMovesTable() {
         String statementStringCreate = "CREATE TABLE IF NOT EXISTS moves (" +
@@ -17,7 +17,7 @@ public class Database {
             sqlStatement.execute(statementStringCreate);
             System.out.println("Moves table ready.");
         } catch (SQLException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
         }
     }
 
@@ -34,7 +34,7 @@ public class Database {
             sqlStatement.executeUpdate();
 
         } catch (SQLException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
         }
     }
 }

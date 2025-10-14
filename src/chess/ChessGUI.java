@@ -77,8 +77,10 @@ public class ChessGUI extends JPanel {
                                 'a' + moveStartColumn, 8 - moveStartRow,
                                 'a' + moveEndCol, 8 - moveEndRow);
 
+                        chess.Database.saveMove("openingNameHolder1", moveNotation);
                         moveHistory.add(moveNotation);
                         System.out.println("Move recorded: " + moveNotation);
+
 
 
 

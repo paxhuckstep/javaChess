@@ -14,9 +14,7 @@ public abstract class Piece {
         return this.isWhite;
     }
 
-    public List<int[]> getCandidateMoves(int column, int row) {  // always overwritten
-        return null;
-    }
+    public abstract List<int[]> getCandidateMoves(int column, int row);   // always overwritten
 
     // Is overwritten for pawns, supered for kings, works for bishop rook knight queen
     public List<int[]> handleObstacles(int column, int row, Piece[][] boardData, List<int[]> candidateMoves) {
@@ -97,11 +95,11 @@ public abstract class Piece {
                     if (potentialAttacker.getIsWhite() == isWhiteAttack) {
                         boolean isStraightAttack = (direction[0] == 0 || direction[1] == 0);
                         boolean isDiagonalAttack = Math.abs(direction[0]) == Math.abs(direction[1]);
-                        boolean isKingAttack = Math.abs(targetColumn - scanColumn) ==1 || Math.abs(targetRow - scanRow) == 1;
+                        boolean isKingAttack = Math.abs(targetColumn - scanColumn) == 1 || Math.abs(targetRow - scanRow) == 1;
 
                         if ((isStraightAttack && (potentialAttacker instanceof Rook || potentialAttacker instanceof Queen)) ||
                                 (isDiagonalAttack && (potentialAttacker instanceof Bishop || potentialAttacker instanceof Queen))
-                        || (isKingAttack && potentialAttacker instanceof  King)) {
+                                || (isKingAttack && potentialAttacker instanceof King)) {
                             return true; // Square is seen
                         }
                     }

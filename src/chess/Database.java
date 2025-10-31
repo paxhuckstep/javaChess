@@ -6,32 +6,27 @@ public class Database {
     private static final String URL = "jdbc:sqlite:C:/Users/paxhu/IdeaProjects/ChessAppJava/chess_game.db";
 
     public static void createMovesTable() {
-        String statementStringCreate = "CREATE TABLE IF NOT EXISTS moves (" +
-                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                "opening_name TEXT," +
-                "move_text TEXT" +
-                ");";
+        String stringToCreateTable = "CREATE TABLE IF NOT EXISTS This_Game (id INTEGER PRIMARY KEY AUTOINCREMENT ,is_white_turn BOOLEAN ,move_text TEXT);";
 
-        try (Connection connected = DriverManager.getConnection(URL);
-             Statement sqlStatement = connected.createStatement()) {
-            sqlStatement.execute(statementStringCreate);
-            System.out.println("Moves table ready.");
+        try (Connection sqlConnectionObject = DriverManager.getConnection(URL);
+             Statement statementObject = sqlConnectionObject.createStatement()) {
+            statementObject.execute(stringToCreateTable);
+            System.out.println("This_Game table ready.");
         } catch (SQLException e) {
 //            e.printStackTrace();
         }
     }
 
 
+    public static void saveMove(Boolean isWhiteTurn, String move) {
+        String recordMoveStructure = "INSERT INTO This_Game(is_white_turn ,move_text) VALUES(? ,?)";
 
-    public static void saveMove(String openingName, String move) {
-        String statementStringSave = "INSERT INTO moves(opening_name, move_text) VALUES(?, ?)";
+        try (Connection sqlConnectionObject = DriverManager.getConnection(URL);
+             PreparedStatement preparedStatementObject = sqlConnectionObject.prepareStatement(recordMoveStructure)) {
 
-        try (Connection connected = DriverManager.getConnection(URL);
-             PreparedStatement sqlStatement = connected.prepareStatement(statementStringSave)) {
-
-            sqlStatement.setString(1, openingName);
-            sqlStatement.setString(2, move);
-            sqlStatement.executeUpdate();
+            preparedStatementObject.setBoolean(1, isWhiteTurn);
+            preparedStatementObject.setString(2, move);
+            preparedStatementObject.executeUpdate();
 
         } catch (SQLException e) {
 //            e.printStackTrace();

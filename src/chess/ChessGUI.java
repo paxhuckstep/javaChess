@@ -77,9 +77,9 @@ public class ChessGUI extends JPanel {
                                 'a' + moveStartColumn, 8 - moveStartRow,
                                 'a' + moveEndCol, 8 - moveEndRow);
 
-                        chess.Database.saveMove("openingNameHolder1", moveNotation);
+                        chess.Database.saveMove(isWhiteTurn, moveNotation);
                         moveHistory.add(moveNotation);
-                        System.out.println("Move recorded: " + moveNotation);
+                        System.out.println("Move recorded: " + isWhiteTurn + " " + moveNotation);
 
 
 

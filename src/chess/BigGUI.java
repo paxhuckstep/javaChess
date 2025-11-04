@@ -5,6 +5,8 @@ import java.awt.*;
 
 public class BigGUI extends JFrame {
     private final ChessGUI chessBoard;
+    private final IntroGUI introScreen;
+
     public static JFrame bigGuiReference;
 
     public BigGUI() {
@@ -15,11 +17,18 @@ public class BigGUI extends JFrame {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
+        introScreen = new IntroGUI(this::handleFreePlayClicked);
+        add(introScreen);
+
         // Create chessboard
         chessBoard = new ChessGUI(Color.WHITE, Color.lightGray, true);
 
-        //Create Database
+        }
 
+   public void handleFreePlayClicked() {
+        remove(introScreen);
+
+        //Create Database
         chess.Database.createMovesTable();
 
         // Create buttons
@@ -40,5 +49,7 @@ public class BigGUI extends JFrame {
         flipButton.addActionListener(e -> {
             chessBoard.flipBoard();
         });
+        revalidate();
+        repaint();
     }
 }

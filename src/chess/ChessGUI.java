@@ -61,13 +61,6 @@ public class ChessGUI extends JPanel {
                         boardData[lastClickedSquare[0]][lastClickedSquare[1]] = null;
                         boardData[c][r] = lastClickedPiece;
 
-
-
-
-
-
-
-
                         int moveStartColumn = isWhitePovGlobal ? lastClickedSquare[0] : 7 - lastClickedSquare[0];
                         int moveStartRow = isWhitePovGlobal ? lastClickedSquare[1] : 7 - lastClickedSquare[1];
                         int moveEndCol   = isWhitePovGlobal ? c : 7 - c;
@@ -80,14 +73,6 @@ public class ChessGUI extends JPanel {
                         chess.Database.saveMove(isWhiteTurn, moveNotation);
                         moveHistory.add(moveNotation);
                         System.out.println("Move recorded: " + isWhiteTurn + " " + moveNotation);
-
-
-
-
-
-
-
-
 
                         isWhiteTurn = !isWhiteTurn;
 

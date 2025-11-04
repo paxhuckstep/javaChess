@@ -17,6 +17,20 @@ public class Database {
         }
     }
 
+    public static void createOpeningTable(String openingName) {
+        String stringToAddOpeningTable =
+                "CREATE TABLE IF NOT EXISTS " + openingName +
+                        " (id INTEGER PRIMARY KEY AUTOINCREMENT, is_white_turn BOOLEAN, move_text TEXT);";
+
+        try (Connection sqlConnectionObject = DriverManager.getConnection(URL);
+             Statement statementObject = sqlConnectionObject.createStatement()) {
+            statementObject.execute(stringToAddOpeningTable);
+            System.out.println(openingName + " table ready.");
+        } catch (SQLException e) {
+//            e.printStackTrace();
+        }
+    }
+
 
     public static void saveMove(Boolean isWhiteTurn, String move) {
         String recordMoveStructure = "INSERT INTO This_Game(is_white_turn ,move_text) VALUES(? ,?)";

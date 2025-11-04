@@ -4,11 +4,12 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class IntroGUI extends JPanel {
     private List<String> openingsList = new ArrayList<>();
 
-    public IntroGUI(Runnable freePlayClick) {
+    public IntroGUI(Runnable freePlayClick, Consumer<String> addWhiteOpening) {
         setSize(600, 600);
         setLayout(new GridLayout(3, 2));
 
@@ -17,19 +18,25 @@ public class IntroGUI extends JPanel {
 
         JLabel chooseOpeningLabel = new JLabel("Choose Opening: ");
         JComboBox<String> openingsDropdown = new JComboBox<>(openingsList.toArray(new String[0]));
-        JButton newOpeningButton = new JButton("Add Opening");
+        JButton addWhiteOpeningButton = new JButton("Add Opening");
+        JTextField newOpeningTextField = new JTextField(10);
         JButton startButton = new JButton("Start");
         JButton freePlayButton = new JButton("Free Play");
 
         freePlayButton.addActionListener(e -> freePlayClick.run());
+        addWhiteOpeningButton.addActionListener(e -> {
+            addWhiteOpening.accept(newOpeningTextField.getText());
+        });
 
-
+//line 1
         add(chooseOpeningLabel);
-        add(newOpeningButton);
+        add(newOpeningTextField);
 
+//line 2
         add(openingsDropdown);
-        add(new JLabel(""));
+        add(addWhiteOpeningButton);
 
+//line 3
         add(startButton);
         add(freePlayButton);
 

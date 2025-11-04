@@ -2,6 +2,7 @@ package chess;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.function.Consumer;
 
 public class BigGUI extends JFrame {
     private final ChessGUI chessBoard;
@@ -17,13 +18,18 @@ public class BigGUI extends JFrame {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        introScreen = new IntroGUI(this::handleFreePlayClicked);
+        introScreen = new IntroGUI(this::handleFreePlayClicked, this::handleAddOpeningClicked);
         add(introScreen);
 
         // Create chessboard
         chessBoard = new ChessGUI(Color.WHITE, Color.lightGray, true);
 
         }
+
+
+   public void handleAddOpeningClicked(String openingName) {
+        Database.createOpeningTable(openingName);
+   }
 
    public void handleFreePlayClicked() {
         remove(introScreen);

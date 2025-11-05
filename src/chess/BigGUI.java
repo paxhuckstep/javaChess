@@ -27,8 +27,8 @@ public class BigGUI extends JFrame {
         }
 
 
-   public void handleAddOpeningClicked(String openingName) {
-        Database.createOpeningTable(openingName);
+   public void handleAddOpeningClicked(String openingName, boolean isWhiteOpening) {
+        Database.createOpeningTable(openingName, isWhiteOpening);
    }
 
    public void handleFreePlayClicked() {

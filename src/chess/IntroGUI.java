@@ -4,12 +4,13 @@ import javax.swing.*;
 import java.awt.*;
 //import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class IntroGUI extends JPanel {
     private List<String> openingsList;
 
-    public IntroGUI(Runnable freePlayClick, Consumer<String> addWhiteOpening) {
+    public IntroGUI(Runnable freePlayClick, BiConsumer<String, Boolean> addWhiteOpening) {
         setSize(600, 600);
         setLayout(new GridLayout(4, 2));
         openingsList = Database.getAllOpenings();
@@ -21,11 +22,12 @@ public class IntroGUI extends JPanel {
         JButton startButton = new JButton("Start");
         JButton addLineButton = new JButton("Add Line");
         JCheckBox isWhiteOpeningCheckbox = new JCheckBox("Is White Opening?");
+        isWhiteOpeningCheckbox.setSelected(true);
         JButton freePlayButton = new JButton("Free Play");
 
         freePlayButton.addActionListener(e -> freePlayClick.run());
         addOpeningButton.addActionListener(e -> {
-            addWhiteOpening.accept(newOpeningTextField.getText());
+            addWhiteOpening.accept(newOpeningTextField.getText(), isWhiteOpeningCheckbox.isSelected());
         });
 
 //line 1

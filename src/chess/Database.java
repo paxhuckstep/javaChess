@@ -1,6 +1,8 @@
 package chess;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Database {
     private static final String URL = "jdbc:sqlite:C:/Users/paxhu/IdeaProjects/ChessAppJava/chess_game.db";
@@ -45,5 +47,26 @@ public class Database {
         } catch (SQLException e) {
 //            e.printStackTrace();
         }
+
     }
+    public static List<String> getAllOpenings() {
+        List<String> openingNames = new ArrayList<>();
+        try (Connection conn = DriverManager.getConnection(URL);
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT name FROM sqlite_master WHERE type='table'")) {
+
+
+            while (rs.next()) {
+                openingNames.add(rs.getString("name"));
+
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return openingNames;
+    }
+
+
 }

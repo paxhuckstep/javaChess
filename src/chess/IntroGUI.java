@@ -10,7 +10,7 @@ import java.util.function.Consumer;
 public class IntroGUI extends JPanel {
     private List<String> openingsList;
 
-    public IntroGUI(Runnable freePlayClick, BiConsumer<String, Boolean> addWhiteOpening) {
+    public IntroGUI(Runnable freePlayClick, BiConsumer<String, Boolean> addWhiteOpening, Consumer<String> addLineClick) {
         setSize(600, 600);
         setLayout(new GridLayout(4, 2));
         openingsList = Database.getAllOpenings();
@@ -26,25 +26,30 @@ public class IntroGUI extends JPanel {
         JButton freePlayButton = new JButton("Free Play");
 
         freePlayButton.addActionListener(e -> freePlayClick.run());
+
         addOpeningButton.addActionListener(e -> {
             addWhiteOpening.accept(newOpeningTextField.getText(), isWhiteOpeningCheckbox.isSelected());
         });
 
+        addLineButton.addActionListener(e -> {
+            addLineClick.accept((String) openingsDropdown.getSelectedItem());
+        });
+
 //line 1
         add(chooseOpeningLabel);
-        add(newOpeningTextField);
+        add(newOpeningTextField); //coded
 
 //line 2
-        add(openingsDropdown);
-        add(isWhiteOpeningCheckbox);
+        add(openingsDropdown); //coded
+        add(isWhiteOpeningCheckbox); //coded
 
 
 //line 3
         add(addLineButton);
-        add(addOpeningButton);
+        add(addOpeningButton); //coded
         //Line 4
         add(startButton);
-        add(freePlayButton);
+        add(freePlayButton); //coded ?
 
 
 

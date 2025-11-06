@@ -22,7 +22,7 @@ public class Database {
     public static void createOpeningTable(String openingName, boolean isWhiteOpening) {
         String stringToAddOpeningTable =
                 "CREATE TABLE IF NOT EXISTS " + openingName +
-                        " (id INTEGER PRIMARY KEY AUTOINCREMENT, is_white_opening BOOLEAN DEFAULT " + (isWhiteOpening ? "1" : "0") + ", is_white_turn BOOLEAN, move_text TEXT);";
+                        " (id INTEGER PRIMARY KEY AUTOINCREMENT, is_white_opening BOOLEAN DEFAULT " + (isWhiteOpening ? "1" : "0") + ", line_number INTEGER, is_white_turn BOOLEAN, move_text TEXT);";
 
         try (Connection sqlConnectionObject = DriverManager.getConnection(URL);
              Statement statementObject = sqlConnectionObject.createStatement()) {
@@ -34,14 +34,14 @@ public class Database {
     }
 
 
-    public static void saveMove(Boolean isWhiteTurn, String move) {
-        String recordMoveStructure = "INSERT INTO This_Game(is_white_turn ,move_text) VALUES(? ,?)";
+    public static void saveMoveToOpening(String openingName, int lineNumber, Boolean isWhiteTurn, String move) {
+        String recordMoveStructure = "INSERT INTO " + openingName + "(is_white_turn ,move_text) VALUES(? ,?)";
 
         try (Connection sqlConnectionObject = DriverManager.getConnection(URL);
              PreparedStatement preparedStatementObject = sqlConnectionObject.prepareStatement(recordMoveStructure)) {
-
-            preparedStatementObject.setBoolean(1, isWhiteTurn);
-            preparedStatementObject.setString(2, move);
+            preparedStatementObject.setInt(1, lineNumber);
+            preparedStatementObject.setBoolean(2, isWhiteTurn);
+            preparedStatementObject.setString(3, move);
             preparedStatementObject.executeUpdate();
 
         } catch (SQLException e) {
@@ -66,6 +66,28 @@ public class Database {
         }
 
         return openingNames;
+    }
+
+
+    public static int getMaxLineNumber(String openingName) {
+        int maxLine = 0;
+        String query = "SELECT MAX(line_number) FROM OpeningMoves WHERE opening_name = ?";
+
+        try (Connection conn = DriverManager.getConnection(URL);
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setString(1, openingName);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                maxLine = rs.getInt(1); // returns 0 if null
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return maxLine
+
     }
 
 

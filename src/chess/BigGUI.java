@@ -5,7 +5,7 @@ import java.awt.*;
 import java.util.function.Consumer;
 
 public class BigGUI extends JFrame {
-    private final ChessGUI chessBoard;
+    private  ChessGUI chessBoard;
     private final IntroGUI introScreen;
 
     public static JFrame bigGuiReference;
@@ -18,11 +18,13 @@ public class BigGUI extends JFrame {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        introScreen = new IntroGUI(this::handleFreePlayClicked, this::handleAddOpeningClicked);
+        introScreen = new IntroGUI(this::handleFreePlayClicked, this::handleAddOpeningClicked, this::handleAddLineClicked);
         add(introScreen);
 
         // Create chessboard
-        chessBoard = new ChessGUI(Color.WHITE, Color.lightGray, true);
+//        chessBoard = new ChessGUI(Color.WHITE, Color.lightGray, true);
+        //Create Database
+        chess.Database.createMovesTable();
 
         }
 
@@ -34,8 +36,36 @@ public class BigGUI extends JFrame {
    public void handleFreePlayClicked() {
         remove(introScreen);
 
-        //Create Database
-        chess.Database.createMovesTable();
+       // Create chessboard
+        chessBoard = new ChessGUI(Color.WHITE, Color.lightGray, true, "freePlay", "freePlay");
+
+        // Create buttons
+        JButton resetButton = new JButton("New Game");
+        JButton flipButton = new JButton("Flip Board");
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(resetButton);
+        buttonPanel.add(flipButton);
+
+        // Add to frame
+        add(chessBoard, BorderLayout.CENTER);
+        add(buttonPanel, BorderLayout.SOUTH);
+
+        resetButton.addActionListener(e -> {
+            chessBoard.resetGame();
+        });
+        flipButton.addActionListener(e -> {
+            chessBoard.flipBoard();
+        });
+        revalidate();
+        repaint();
+    }
+
+    public void handleAddLineClicked(String openingName) {
+        remove(introScreen);
+
+        // Create chessboard
+        chessBoard = new ChessGUI(Color.WHITE, Color.lightGray, true, "addLine", openingName);
 
         // Create buttons
         JButton resetButton = new JButton("New Game");

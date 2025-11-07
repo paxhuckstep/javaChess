@@ -37,12 +37,16 @@ public class ChessGUI extends JPanel {
         if (mode.equals("freePlay")) {
             //free play
             isFreePlay = true;
+            System.out.println("We are in freePlay Mode");
         } else if (mode.equals("addLine")) {
             //add line
+
             lineNumber = Database.getMaxLineNumber(openingName) + 1;
+            System.out.println("We are in addLine mode, lineNumber is: " + lineNumber);
         } else if (mode.equals("drill")) {
 //            drill
             isDrill = true;
+            System.out.println("We are in drill mode!");
         }
 
         for (int row = 0; row < 8; row++) {
@@ -81,16 +85,25 @@ public class ChessGUI extends JPanel {
                         int moveEndCol   = isWhitePovGlobal ? c : 7 - c;
                         int moveEndRow   = isWhitePovGlobal ? r : 7 - r;
 
+                        System.out.println("isFreePlay?: " + isFreePlay);
                         if (!isFreePlay) {
+                            System.out.println("it isn't free play");
                             String moveNotation = String.format("%c%d to %c%d",
                                     'a' + moveStartColumn, 8 - moveStartRow,
                                     'a' + moveEndCol, 8 - moveEndRow);
-                            if (!isDrill) {
+                            System.out.println("moveNotation: " + moveNotation);
+                            if (mode.equals("addLine")) {
+                                System.out.println("It is addLine mode");
+                                System.out.println("openingName: " + openingName + ".. lineNumber: " + lineNumber + "... isWhiteTurn: " + isWhiteTurn + "...moveNotation: " + moveNotation);
+
                                 chess.Database.saveMoveToOpening(openingName, lineNumber, isWhiteTurn, moveNotation);
+//                                System.out.println("openingName: " + openingName + ".. lineNumber: " + lineNumber + "... isWhiteTurn: " + isWhiteTurn + "...moveNotation: " + moveNotation);
                             }
                         moveHistory.add(moveNotation);
                             System.out.println("Move recorded: " + isWhiteTurn + " " + moveNotation);
                         }
+
+                        System.out.println("Changes turns");
                         isWhiteTurn = !isWhiteTurn;
 
 

@@ -35,7 +35,7 @@ public class Database {
 
 
     public static void saveMoveToOpening(String openingName, int lineNumber, Boolean isWhiteTurn, String move) {
-        String recordMoveStructure = "INSERT INTO " + openingName + "(is_white_turn ,move_text) VALUES(? ,?)";
+        String recordMoveStructure = "INSERT INTO " + openingName + "(line_number, is_white_turn ,move_text) VALUES(? ,? ,?)";
 
         try (Connection sqlConnectionObject = DriverManager.getConnection(URL);
              PreparedStatement preparedStatementObject = sqlConnectionObject.prepareStatement(recordMoveStructure)) {
@@ -49,6 +49,7 @@ public class Database {
         }
 
     }
+
     public static List<String> getAllOpenings() {
         List<String> openingNames = new ArrayList<>();
         try (Connection conn = DriverManager.getConnection(URL);
@@ -71,12 +72,14 @@ public class Database {
 
     public static int getMaxLineNumber(String openingName) {
         int maxLine = 0;
+        System.out.println("openingName looking for maxLine: " + openingName);
+
         String query = "SELECT MAX(line_number) FROM OpeningMoves WHERE opening_name = ?";
 
         try (Connection conn = DriverManager.getConnection(URL);
              PreparedStatement stmt = conn.prepareStatement(query)) {
 
-            stmt.setString(1, openingName);
+            stmt.setString(1, openingName.trim());
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
@@ -86,7 +89,10 @@ public class Database {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return maxLine
+        System.out.println("maxLine found: " + maxLine);
+
+        return maxLine;
+
 
     }
 

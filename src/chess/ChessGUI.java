@@ -117,6 +117,7 @@ public class ChessGUI extends JPanel {
                         //Castling Rights Update
                         if (lastClickedPiece instanceof King) {
                             if (lastClickedSquare[1] == 0) {
+
                                 topKingMoved = true;
                             } else if (lastClickedSquare[1] == 7) {
                                 bottomKingMoved = true;

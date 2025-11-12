@@ -72,15 +72,13 @@ public class Database {
 
     public static int getMaxLineNumber(String openingName) {
         int maxLine = 0;
-        System.out.println("openingName looking for maxLine: " + openingName);
+        System.out.println("opening that we're looking for maxLine: " + openingName);
 
-        String query = "SELECT MAX(line_number) FROM OpeningMoves WHERE opening_name = ?";
+        String query = "SELECT MAX(line_number) FROM " + openingName;
 
         try (Connection conn = DriverManager.getConnection(URL);
-             PreparedStatement stmt = conn.prepareStatement(query)) {
-
-            stmt.setString(1, openingName.trim());
-            ResultSet rs = stmt.executeQuery();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
 
             if (rs.next()) {
                 maxLine = rs.getInt(1); // returns 0 if null
@@ -92,8 +90,6 @@ public class Database {
         System.out.println("maxLine found: " + maxLine);
 
         return maxLine;
-
-
     }
 
 

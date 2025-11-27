@@ -7,31 +7,49 @@ import java.util.List;
 public class Database {
     private static final String URL = "jdbc:sqlite:C:/Users/paxhu/IdeaProjects/ChessAppJava/chess_game.db";
 
-    public static void createMovesTable() {
-        String stringToCreateTable = "CREATE TABLE IF NOT EXISTS This_Game (id INTEGER PRIMARY KEY AUTOINCREMENT ,is_white_turn BOOLEAN ,move_text TEXT);";
+    public static void createOpeningsIsWhiteTable() {
+        String stringToCreateTable = "CREATE TABLE IF NOT EXISTS OpeningsIsWhite (" +
+                "    name TEXT PRIMARY KEY," +
+                "    is_white_opening BOOLEAN" +
+                ");";
 
         try (Connection sqlConnectionObject = DriverManager.getConnection(URL);
              Statement statementObject = sqlConnectionObject.createStatement()) {
             statementObject.execute(stringToCreateTable);
-            System.out.println("This_Game table ready.");
+            System.out.println("OpeningsIsWhite table ready.");
+
         } catch (SQLException e) {
-//            e.printStackTrace();
+//                e.printStackTrace();
         }
     }
 
-    public static void createOpeningTable(String openingName, boolean isWhiteOpening) {
-        String stringToAddOpeningTable =
-                "CREATE TABLE IF NOT EXISTS " + openingName +
-                        " (id INTEGER PRIMARY KEY AUTOINCREMENT, is_white_opening BOOLEAN DEFAULT " + (isWhiteOpening ? "1" : "0") + ", line_number INTEGER, is_white_turn BOOLEAN, move_text TEXT);";
+public static void addNewOpening(String openingName, boolean isWhiteOpening) {
+    String createOpeningTable =
+            "CREATE TABLE IF NOT EXISTS " + openingName +
+                    " (id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    " line_number INTEGER, is_white_turn BOOLEAN, move_text TEXT);";
 
-        try (Connection sqlConnectionObject = DriverManager.getConnection(URL);
-             Statement statementObject = sqlConnectionObject.createStatement()) {
-            statementObject.execute(stringToAddOpeningTable);
-            System.out.println(openingName + " table ready.");
-        } catch (SQLException e) {
-//            e.printStackTrace();
-        }
+    String addToOpeningsIsWhite =
+            "INSERT INTO OpeningsIsWhite (name, is_white_opening) VALUES (?, ?)";
+
+    try (Connection sqlConnectionObject = DriverManager.getConnection(URL);
+         Statement statementObject = sqlConnectionObject.createStatement();
+         PreparedStatement pstmt = sqlConnectionObject.prepareStatement(addToOpeningsIsWhite)) {
+
+        // Create the moves table for this opening
+        statementObject.execute(createOpeningTable);
+        System.out.println(openingName + " table ready.");
+
+        // Register the opening in the metadata table
+        pstmt.setString(1, openingName);
+        pstmt.setBoolean(2, isWhiteOpening);
+        pstmt.executeUpdate();
+
+        System.out.println("OpeningIsWhite " + openingName + " added to Openings metadata.");
+    } catch (SQLException e) {
+        e.printStackTrace();
     }
+}
 
 
     public static void saveMoveToOpening(String openingName, int lineNumber, Boolean isWhiteTurn, String move) {
@@ -69,7 +87,6 @@ public class Database {
         return openingNames;
     }
 
-
     public static int getMaxLineNumber(String openingName) {
         int maxLine = 0;
         System.out.println("opening that we're looking for maxLine: " + openingName);
@@ -91,4 +108,28 @@ public class Database {
 
         return maxLine;
     }
+
+    public static boolean getIsWhiteOpening(String openingName) {
+        boolean isWhiteOpening = false;
+        String query = "SELECT is_white_opening FROM OpeningsIsWhite WHERE name = ? LIMIT 1";
+
+        try (Connection conn = DriverManager.getConnection(URL);
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setString(1, openingName);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    isWhiteOpening = rs.getBoolean("is_white_opening");
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println("isWhiteOpening found for " + openingName + ": " + isWhiteOpening);
+        return isWhiteOpening;
+    }
+
+
 }

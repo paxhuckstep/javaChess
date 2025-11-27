@@ -24,13 +24,13 @@ public class BigGUI extends JFrame {
         // Create chessboard
 //        chessBoard = new ChessGUI(Color.WHITE, Color.lightGray, true);
         //Create Database
-        chess.Database.createMovesTable();
+//        chess.Database.createMovesTable();
 
         }
 
 
    public void handleAddOpeningClicked(String openingName, boolean isWhiteOpening) {
-        Database.createOpeningTable(openingName, isWhiteOpening);
+        Database.addNewOpening(openingName, isWhiteOpening);
    }
 
    public void handleFreePlayClicked() {
@@ -65,7 +65,7 @@ public class BigGUI extends JFrame {
         remove(introScreen);
 
         // Create chessboard
-        chessBoard = new ChessGUI(Color.WHITE, Color.lightGray, true, "addLine", openingName);
+        chessBoard = new ChessGUI(Color.WHITE, Color.lightGray, Database.getIsWhiteOpening(openingName), "addLine", openingName);
 
         // Create buttons
         JButton saveLineButton = new JButton("Save Line");

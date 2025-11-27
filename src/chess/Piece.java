@@ -14,7 +14,7 @@ public abstract class Piece {
         return this.isWhite;
     }
 
-    public abstract List<int[]> getCandidateMoves(int column, int row);   // always overwritten
+    public abstract List<int[]> getCandidateMoves(int column, int row);   // always overwritten #abstract
 
     // Is overwritten for pawns, supered for kings, works for bishop rook knight queen
     public List<int[]> handleObstacles(int column, int row, Piece[][] boardData, List<int[]> candidateMoves) {

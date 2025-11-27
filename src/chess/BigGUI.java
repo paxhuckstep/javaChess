@@ -68,19 +68,22 @@ public class BigGUI extends JFrame {
         chessBoard = new ChessGUI(Color.WHITE, Color.lightGray, true, "addLine", openingName);
 
         // Create buttons
-        JButton resetButton = new JButton("New Game");
+        JButton saveLineButton = new JButton("Save Line");
+//        JButton resetButton = new JButton("New Game");
         JButton flipButton = new JButton("Flip Board");
 
         JPanel buttonPanel = new JPanel();
-        buttonPanel.add(resetButton);
+//        buttonPanel.add(resetButton);
+        buttonPanel.add(saveLineButton);
         buttonPanel.add(flipButton);
 
         // Add to frame
         add(chessBoard, BorderLayout.CENTER);
         add(buttonPanel, BorderLayout.SOUTH);
 
-        resetButton.addActionListener(e -> {
-            chessBoard.resetGame();
+        saveLineButton.addActionListener(e -> {
+            // add line code
+            System.out.println("Add Line Clicked");
         });
         flipButton.addActionListener(e -> {
             chessBoard.flipBoard();

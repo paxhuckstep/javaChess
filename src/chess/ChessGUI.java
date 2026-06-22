@@ -37,12 +37,12 @@ public class ChessGUI extends JPanel {
         if (mode.equals("freePlay")) {
             //free play
             isFreePlay = true;
-            System.out.println("We are in freePlay Mode");
+//            System.out.println("We are in freePlay Mode");
         } else if (mode.equals("addLine")) {
             //add line
 
             lineNumber = Database.getMaxLineNumber(openingName) + 1;
-            System.out.println("We are in addLine mode, lineNumber is: " + lineNumber);
+//            System.out.println("We are in addLine mode, lineNumber is: " + lineNumber);
         } else if (mode.equals("drill")) {
 //            drill
             isDrill = true;
@@ -65,25 +65,32 @@ public class ChessGUI extends JPanel {
                 int r = row;
                 squareButton.addActionListener(e -> {
                     if (boardButtons[c][r].getIsLegal()) { // We're moving a piece
+                        Piece movingPiece = lastClickedPiece;
+                        int[] startingSquare = lastClickedSquare;
+                        int[] endingSquare = {c, r};
+                        movePiece(startingSquare, endingSquare, movingPiece);
 
-                        //handle En Pessant capture
-                        if (lastClickedPiece instanceof Pawn && lastClickedSquare[0] != c && boardData[c][r] == null) {
-                            boardData[c][r - (isWhitePovGlobal == lastClickedPiece.getIsWhite() ? -1 : 1)] = null;
-                        }
-                        //"50 move rule" counter
-                        if (lastClickedPiece instanceof Pawn || boardData[c][r] != null) {
-                            halfMoveCount = 0;
-                        } else {
-                            halfMoveCount++;
-                        }
-                        //move piece
-                        boardData[lastClickedSquare[0]][lastClickedSquare[1]] = null;
-                        boardData[c][r] = lastClickedPiece;
+//                        //handle En Pessant capture --
+//                        if (lastClickedPiece instanceof Pawn && lastClickedSquare[0] != c && boardData[c][r] == null) {
+//                            boardData[c][r - (isWhitePovGlobal == lastClickedPiece.getIsWhite() ? -1 : 1)] = null;
+//                        }
+//                        //"50 move rule" counter --
+//                        if (lastClickedPiece instanceof Pawn || boardData[c][r] != null) {
+//                            halfMoveCount = 0;
+//                        } else {
+//                            halfMoveCount++;
+//                        }
+//                        //move piece --
+//                        boardData[lastClickedSquare[0]][lastClickedSquare[1]] = null;
+//                        boardData[c][r] = lastClickedPiece;
+//
 
+
+                        // I think this goes to freePlay shit
                         int moveStartColumn = isWhitePovGlobal ? lastClickedSquare[0] : 7 - lastClickedSquare[0];
                         int moveStartRow = isWhitePovGlobal ? lastClickedSquare[1] : 7 - lastClickedSquare[1];
-                        int moveEndCol   = isWhitePovGlobal ? c : 7 - c;
-                        int moveEndRow   = isWhitePovGlobal ? r : 7 - r;
+                        int moveEndCol = isWhitePovGlobal ? c : 7 - c;
+                        int moveEndRow = isWhitePovGlobal ? r : 7 - r;
 
                         System.out.println("isFreePlay?: " + isFreePlay);
                         if (!isFreePlay) {
@@ -96,130 +103,130 @@ public class ChessGUI extends JPanel {
                                 System.out.println("It is addLine mode");
                                 System.out.println("openingName: " + openingName + ".. lineNumber: " + lineNumber + "... isWhiteTurn: " + isWhiteTurn + "...moveNotation: " + moveNotation);
 
-                                chess.Database.saveMoveToOpening(openingName, lineNumber, isWhiteTurn, moveNotation);
+                                Database.saveMoveToOpening(openingName, lineNumber, isWhiteTurn, moveNotation);
 //                                System.out.println("openingName: " + openingName + ".. lineNumber: " + lineNumber + "... isWhiteTurn: " + isWhiteTurn + "...moveNotation: " + moveNotation);
                             }
-                        moveHistory.add(moveNotation);
+                            moveHistory.add(moveNotation);
                             System.out.println("Move recorded: " + isWhiteTurn + " " + moveNotation);
                         }
 
-                        System.out.println("Changes turns");
-                        isWhiteTurn = !isWhiteTurn;
-
-
-                        //EnPessant Rights Update
-                        if (lastClickedPiece instanceof Pawn && Math.abs(r - lastClickedSquare[1]) == 2) {
-                            enPessantColumn = c;
-                        } else {
-                            enPessantColumn = -1;
-                        }
-
-                        //Castling Rights Update
-                        if (lastClickedPiece instanceof King) {
-                            if (lastClickedSquare[1] == 0) {
-
-                                topKingMoved = true;
-                            } else if (lastClickedSquare[1] == 7) {
-                                bottomKingMoved = true;
-                            }
-                        } else if (lastClickedPiece instanceof Rook) {
-                            if (lastClickedSquare[1] == 0) { // top row
-                                if (lastClickedSquare[0] == 0) topLeftRookMoved = true;
-                                if (lastClickedSquare[0] == 7) topRightRookMoved = true;
-                            } else if (lastClickedSquare[1] == 7) { // bottom row
-                                if (lastClickedSquare[0] == 0) bottomLeftRookMoved = true;
-                                if (lastClickedSquare[0] == 7) bottomRightRookMoved = true;
-                            }
-                        }
-
-                        // Handle castling rook movement
-                        if (lastClickedPiece instanceof King) {
-                            int previousRow = lastClickedSquare[1];
-                            if (previousRow == 7) {
-                                if (isWhitePovGlobal) {
-                                    if (c == 6) {
-                                        boardData[5][7] = boardData[7][7];
-                                        boardData[7][7] = null;
-                                        bottomRightRookMoved = true;
-                                    } else if (c == 2) {
-                                        boardData[3][7] = boardData[0][7];
-                                        boardData[0][7] = null;
-                                        bottomLeftRookMoved = true;
-                                    }
-                                } else {
-                                    if (c == 1) {
-                                        boardData[2][7] = boardData[0][7];
-                                        boardData[0][7] = null;
-                                        bottomLeftRookMoved = true;
-                                    } else if (c == 5) {
-                                        boardData[4][7] = boardData[7][7];
-                                        boardData[7][7] = null;
-                                        bottomRightRookMoved = true;
-                                    }
-                                }
-                            } else if (previousRow == 0) {
-                                if (isWhitePovGlobal) {
-                                    if (c == 6) {
-                                        boardData[5][0] = boardData[7][0];
-                                        boardData[7][0] = null;
-                                        topRightRookMoved = true;
-                                    } else if (c == 2) {
-                                        boardData[3][0] = boardData[0][0];
-                                        boardData[0][0] = null;
-                                        topLeftRookMoved = true;
-                                    }
-                                } else {
-                                    if (c == 1) {
-                                        boardData[2][0] = boardData[0][0];
-                                        boardData[0][0] = null;
-                                        topLeftRookMoved = true;
-                                    } else if (c == 5) {
-                                        boardData[4][0] = boardData[7][0];
-                                        boardData[7][0] = null;
-                                        topRightRookMoved = true;
-                                    }
-                                }
-                            }
-                        }
-
-                        //handlePromotion
-                        if (lastClickedPiece instanceof Pawn && (r == 0 || r == 7)) {
-                            String promotionPiece = PromotionGUI.openPromotionPopup(BigGUI.bigGuiReference, lastClickedPiece.getIsWhite());
-                            switch (promotionPiece) {
-                                case "queen":
-                                    boardData[c][r] = new Queen(lastClickedPiece.getIsWhite());
-                                    break;
-                                case "rook":
-                                    boardData[c][r] = new Rook(lastClickedPiece.getIsWhite());
-                                    break;
-                                case "bishop":
-                                    boardData[c][r] = new Bishop(lastClickedPiece.getIsWhite());
-                                    break;
-                                case "knight":
-                                    boardData[c][r] = new Knight(lastClickedPiece.getIsWhite());
-                                    break;
-                            }
-                        }
-
-                        // repaint
-                        refreshBoard(boardData);
-
-                        // end of game check
-                        if (isStalemate()) {
-                            String endGameMessage;
-                            if (isCheck()) {
-                                if (isWhiteTurn) {
-                                    endGameMessage = "Black Wins by Checkmate!";
-                                } else {
-                                    endGameMessage = "White Wins by Checkmate!";
-                                }
-                            } else {
-                                endGameMessage = "Stalemate!";
-                            }
-                            JOptionPane.showMessageDialog(BigGUI.bigGuiReference, endGameMessage);
-                        } else if (halfMoveCount == 100) {
-                            JOptionPane.showMessageDialog(BigGUI.bigGuiReference, "Draw, 50 move rule");
-                        }
+//                        //Changes Turn --
+//                        isWhiteTurn = !isWhiteTurn;
+//
+//
+//                        //EnPessant Rights Update --
+//                        if (lastClickedPiece instanceof Pawn && Math.abs(r - lastClickedSquare[1]) == 2) {
+//                            enPessantColumn = c;
+//                        } else {
+//                            enPessantColumn = -1;
+//                        }
+//
+//                        //Castling Rights Update --
+//                        if (lastClickedPiece instanceof King) {
+//                            if (lastClickedSquare[1] == 0) {
+//
+//                                topKingMoved = true;
+//                            } else if (lastClickedSquare[1] == 7) {
+//                                bottomKingMoved = true;
+//                            }
+//                        } else if (lastClickedPiece instanceof Rook) {
+//                            if (lastClickedSquare[1] == 0) { // top row
+//                                if (lastClickedSquare[0] == 0) topLeftRookMoved = true;
+//                                if (lastClickedSquare[0] == 7) topRightRookMoved = true;
+//                            } else if (lastClickedSquare[1] == 7) { // bottom row
+//                                if (lastClickedSquare[0] == 0) bottomLeftRookMoved = true;
+//                                if (lastClickedSquare[0] == 7) bottomRightRookMoved = true;
+//                            }
+//                        }
+//
+//                        // Handle castling rook movement --
+//                        if (lastClickedPiece instanceof King) {
+//                            int previousRow = lastClickedSquare[1];
+//                            if (previousRow == 7) {
+//                                if (isWhitePovGlobal) {
+//                                    if (c == 6) {
+//                                        boardData[5][7] = boardData[7][7];
+//                                        boardData[7][7] = null;
+//                                        bottomRightRookMoved = true;
+//                                    } else if (c == 2) {
+//                                        boardData[3][7] = boardData[0][7];
+//                                        boardData[0][7] = null;
+//                                        bottomLeftRookMoved = true;
+//                                    }
+//                                } else {
+//                                    if (c == 1) {
+//                                        boardData[2][7] = boardData[0][7];
+//                                        boardData[0][7] = null;
+//                                        bottomLeftRookMoved = true;
+//                                    } else if (c == 5) {
+//                                        boardData[4][7] = boardData[7][7];
+//                                        boardData[7][7] = null;
+//                                        bottomRightRookMoved = true;
+//                                    }
+//                                }
+//                            } else if (previousRow == 0) {
+//                                if (isWhitePovGlobal) {
+//                                    if (c == 6) {
+//                                        boardData[5][0] = boardData[7][0];
+//                                        boardData[7][0] = null;
+//                                        topRightRookMoved = true;
+//                                    } else if (c == 2) {
+//                                        boardData[3][0] = boardData[0][0];
+//                                        boardData[0][0] = null;
+//                                        topLeftRookMoved = true;
+//                                    }
+//                                } else {
+//                                    if (c == 1) {
+//                                        boardData[2][0] = boardData[0][0];
+//                                        boardData[0][0] = null;
+//                                        topLeftRookMoved = true;
+//                                    } else if (c == 5) {
+//                                        boardData[4][0] = boardData[7][0];
+//                                        boardData[7][0] = null;
+//                                        topRightRookMoved = true;
+//                                    }
+//                                }
+//                            }
+//                        }
+//
+//                        //handlePromotion --
+//                        if (lastClickedPiece instanceof Pawn && (r == 0 || r == 7)) {
+//                            String promotionPiece = PromotionGUI.openPromotionPopup(BigGUI.bigGuiReference, lastClickedPiece.getIsWhite());
+//                            switch (promotionPiece) {
+//                                case "queen":
+//                                    boardData[c][r] = new Queen(lastClickedPiece.getIsWhite());
+//                                    break;
+//                                case "rook":
+//                                    boardData[c][r] = new Rook(lastClickedPiece.getIsWhite());
+//                                    break;
+//                                case "bishop":
+//                                    boardData[c][r] = new Bishop(lastClickedPiece.getIsWhite());
+//                                    break;
+//                                case "knight":
+//                                    boardData[c][r] = new Knight(lastClickedPiece.getIsWhite());
+//                                    break;
+//                            }
+//                        }
+//
+//                        // repaint --
+//                        refreshBoard(boardData);
+//
+//                        // end of game check --
+//                        if (isStalemate()) {
+//                            String endGameMessage;
+//                            if (isCheck()) {
+//                                if (isWhiteTurn) {
+//                                    endGameMessage = "Black Wins by Checkmate!";
+//                                } else {
+//                                    endGameMessage = "White Wins by Checkmate!";
+//                                }
+//                            } else {
+//                                endGameMessage = "Stalemate!";
+//                            }
+//                            JOptionPane.showMessageDialog(BigGUI.bigGuiReference, endGameMessage);
+//                        } else if (halfMoveCount == 100) {
+//                            JOptionPane.showMessageDialog(BigGUI.bigGuiReference, "Draw, 50 move rule");
+//                        }
 
                     } else { // Clicked non-legal square (Not moving a piece)
                         // Clean off old legal moves
@@ -312,6 +319,207 @@ public class ChessGUI extends JPanel {
         refreshBoard(flippedBoardData);
     }
 
+    public void movePiece(int[] startSquare, int[] endSquare, Piece movedPiece) {
+        //HANDLE EN PESSANT CAPTURE ...
+        //goes BEFORE!!! movement happens in boardData
+        // checks if destination empty (always full after movement happens.. the moved piece is there)
+        // and checks column changes (meaning pawn capture)
+        // is the only capture that doesn't happen on the endSquare
+        if (movedPiece instanceof Pawn && endSquare[0] != endSquare[0] && boardData[endSquare[0]][endSquare[1]] == null) {
+            boardData[endSquare[0]][endSquare[1] - (isWhitePovGlobal == movedPiece.getIsWhite() ? -1 : 1)] = null;
+        }
+
+        //"50 move rule" counter
+        // **ALSO** goes BEFORE!!! movement happens in boardData
+        // checks if destination ISN'T empty (meaning some type of capture)
+        // pawn moves and captures reset count to 0
+        if (movedPiece instanceof Pawn || boardData[endSquare[0]][endSquare[1]] != null) {
+            halfMoveCount = 0;
+        } else {
+            halfMoveCount++;
+        }
+
+        //MOVE PIECE
+        //(in en pessant, the captured pawn gets removed before the en pessanter is moved)
+        boardData[startSquare[0]][startSquare[1]] = null;
+        boardData[endSquare[0]][endSquare[1]] = movedPiece;
+
+        // CHANGES TURN
+        isWhiteTurn = !isWhiteTurn;
+
+        //eNpESSANT RIGHTS UPDATE
+        //pretty slick
+        if (movedPiece instanceof Pawn && Math.abs(endSquare[1] - startSquare[1]) == 2) {
+            enPessantColumn = endSquare[0];
+        } else {
+            enPessantColumn = -1;
+        }
+
+        //--CASTLING RIGHTS UPDATE
+        // && startSquare[0] == 4 was missing!!
+        // King could travel distance of board and remove opponents castling rights
+        if (movedPiece instanceof King && startSquare[0] == 4) {
+            if (startSquare[1] == 0) {
+                topKingMoved = true;
+            } else if (startSquare[1] == 7) {
+                bottomKingMoved = true;
+            }
+        } else if (movedPiece instanceof Rook) {
+            if (startSquare[1] == 0) { // top row
+                if (startSquare[0] == 0) topLeftRookMoved = true;
+                if (startSquare[0] == 7) topRightRookMoved = true;
+            } else if (startSquare[1] == 7) { // bottom row
+                if (startSquare[0] == 0) bottomLeftRookMoved = true;
+                if (startSquare[0] == 7) bottomRightRookMoved = true;
+            }
+        } //end of castling rights movement
+
+        // Handle castling rook movement
+        // && Math.abs(startSquare[0] - endSquare[0]) == 2 was missing!!!
+        if (movedPiece instanceof King && Math.abs(startSquare[0] - endSquare[0]) == 2) {
+            if (endSquare[1] == 7) { // Bottom Row
+                if (isWhitePovGlobal) { // White on Bottom
+                    if (endSquare[0] == 6) { // White king to g file
+                        boardData[5][7] = boardData[7][7];
+                        boardData[7][7] = null;
+                        bottomRightRookMoved = true;
+                    } else if (endSquare[0] == 2) {
+                        boardData[3][7] = boardData[0][7];
+                        boardData[0][7] = null;
+                        bottomLeftRookMoved = true;
+                    }
+                } else {
+                    if (endSquare[0] == 1) {
+                        boardData[2][7] = boardData[0][7];
+                        boardData[0][7] = null;
+                        bottomLeftRookMoved = true;
+                    } else if (endSquare[0] == 5) {
+                        boardData[4][7] = boardData[7][7];
+                        boardData[7][7] = null;
+                        bottomRightRookMoved = true;
+                    }
+                }
+            } else if (endSquare[1] == 0) {
+                if (isWhitePovGlobal) {
+                    if (endSquare[0] == 6) {
+                        boardData[5][0] = boardData[7][0];
+                        boardData[7][0] = null;
+                        topRightRookMoved = true;
+                    } else if (endSquare[0] == 2) {
+                        boardData[3][0] = boardData[0][0];
+                        boardData[0][0] = null;
+                        topLeftRookMoved = true;
+                    }
+                } else {
+                    if (endSquare[0] == 1) {
+                        boardData[2][0] = boardData[0][0];
+                        boardData[0][0] = null;
+                        topLeftRookMoved = true;
+                    } else if (endSquare[0] == 5) {
+                        boardData[4][0] = boardData[7][0];
+                        boardData[7][0] = null;
+                        topRightRookMoved = true;
+                    }
+                }
+            }
+        } //end of castling rook movement
+
+        //handlePromotion
+        if (movedPiece instanceof Pawn && (endSquare[1] == 0 || endSquare[1] == 7)) {
+            String promotionPiece = PromotionGUI.openPromotionPopup(BigGUI.bigGuiReference, movedPiece.getIsWhite());
+            switch (promotionPiece) {
+                case "queen":
+                    boardData[endSquare[0]][endSquare[1]] = new Queen(movedPiece.getIsWhite());
+                    break;
+                case "rook":
+                    boardData[endSquare[0]][endSquare[1]] = new Rook(movedPiece.getIsWhite());
+                    break;
+                case "bishop":
+                    boardData[endSquare[0]][endSquare[1]] = new Bishop(movedPiece.getIsWhite());
+                    break;
+                case "knight":
+                    boardData[endSquare[0]][endSquare[1]] = new Knight(movedPiece.getIsWhite());
+                    break;
+            }
+        }
+        // repaint
+        refreshBoard(boardData);
+        gameOverCheck();
+
+    } // END OF movePiece
+
+    public void gameOverCheck() {
+        // end of game check
+        if (isStalemate()) {
+            String endGameMessage;
+            if (isCheck()) {
+                if (isWhiteTurn) {
+                    endGameMessage = "Black Wins by Checkmate!";
+                } else {
+                    endGameMessage = "White Wins by Checkmate!";
+                }
+            } else {
+                endGameMessage = "Stalemate!";
+            }
+            JOptionPane.showMessageDialog(BigGUI.bigGuiReference, endGameMessage);
+        } else if (halfMoveCount == 100) {
+            JOptionPane.showMessageDialog(BigGUI.bigGuiReference, "Draw, 50 move rule");
+        }
+    }
+
+
+    public void playRandomMove() {
+        if(isStalemate()){
+            System.out.println("Game is over, can't play random move");
+            return;
+        }
+        //find all my pieces
+        List<int[]> allMyPieceCoordinates = new ArrayList<>();
+        for (int c = 0; c < 8; c++ ) {
+            for (int r = 0; r <8; r ++) {
+                Piece piece = boardData[c][r];
+                if (piece != null && piece.getIsWhite() == isWhiteTurn) {
+                    allMyPieceCoordinates.add(new int[]{c,r});
+                }
+            }
+        }
+
+
+        //pick a random piece
+        int randomCoordinatesIndex = (int) Math.floor(allMyPieceCoordinates.size() * Math.random());
+        // if it can move, move it
+
+        int tries = 0;
+        while(tries < 17) {
+            int[] randomCoordinates = allMyPieceCoordinates.get(randomCoordinatesIndex);
+            Piece tryToMove = boardData[randomCoordinates[0]][randomCoordinates[1]];
+            List<int[]> legalMoves = getPieceLegalMoves(tryToMove, randomCoordinates[0], randomCoordinates[1]);
+            if (legalMoves.isEmpty()) { //Random Piece can't move
+                tries ++;
+                if (randomCoordinatesIndex == allMyPieceCoordinates.size() - 1) {
+                    randomCoordinatesIndex = 0;
+                } else {
+                    randomCoordinatesIndex++;
+                }
+            } else { //Randomly move random piece
+                int randomMoveIndex = (int) Math.floor(legalMoves.size() * Math.random());
+                int[] theMove = legalMoves.get(randomMoveIndex);
+                movePiece(randomCoordinates, theMove, tryToMove);
+                tries = 18;
+            }
+        }
+
+    }
+
+    private List<int[]> getPieceLegalMoves(Piece piece, int column, int row) {
+        List<int[]> candidateMoves = piece.getCandidateMoves(column, row);
+        List<int[]> obstaclesHandled = piece.handleObstacles(column, row, boardData, candidateMoves);
+        List<int[]> noSelfChecks = piece.handleNoSelfChecks(column, row, boardData, obstaclesHandled);
+        List<int[]> legalMoves = piece.handleBlocksCheck(column, row, boardData, noSelfChecks);
+        return legalMoves;
+
+    }
+
     private boolean isStalemate() {
         for (int c = 0; c < 8; c++) {
             for (int r = 0; r < 8; r++) {
@@ -327,6 +535,10 @@ public class ChessGUI extends JPanel {
         }
         return true;
     }
+
+//    private List<int[]> getAllLegalMoves() { //idk how to store piece + move in one big list
+//
+//    }
 
     private boolean isCheck() { //distinguishes stalemate and checkmate
         int[] kingCoordinates = Piece.findMyKing(boardData, isWhiteTurn);

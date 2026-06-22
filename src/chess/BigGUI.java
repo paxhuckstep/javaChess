@@ -42,10 +42,12 @@ public class BigGUI extends JFrame {
         // Create buttons
         JButton resetButton = new JButton("New Game");
         JButton flipButton = new JButton("Flip Board");
+       JButton randomMoveButton = new JButton("Random Move");
 
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(resetButton);
         buttonPanel.add(flipButton);
+        buttonPanel.add(randomMoveButton);
 
         // Add to frame
         add(chessBoard, BorderLayout.CENTER);
@@ -56,6 +58,9 @@ public class BigGUI extends JFrame {
         });
         flipButton.addActionListener(e -> {
             chessBoard.flipBoard();
+        });
+        randomMoveButton.addActionListener(e -> {
+            chessBoard.playRandomMove();
         });
         revalidate();
         repaint();

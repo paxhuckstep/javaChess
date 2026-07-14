@@ -36,9 +36,10 @@ public class King extends Piece {
 
         boolean isTopKing = (kingRow == 0);
         boolean isBottomKing = (kingRow == 7);
+        boolean isCheck = getIsSquareSeen(kingColumn, kingRow, !this.getIsWhite(), boardData);
 
         // handles Bottom King
-        if (isBottomKing && !ChessGUI.bottomKingMoved) {
+        if (isBottomKing && !ChessGUI.bottomKingMoved && !isCheck) {
             if (ChessGUI.isWhitePovGlobal) { // Bottom King && White POV
                 if (!ChessGUI.bottomRightRookMoved && boardData[5][7] == null && boardData[6][7] == null) {
                     maybeCanCastle.add(new int[]{6, 7});
@@ -56,7 +57,7 @@ public class King extends Piece {
             }
         }
         // Handle top king
-        else if (isTopKing && !ChessGUI.topKingMoved) {
+        else if (isTopKing && !ChessGUI.topKingMoved && !isCheck) {
             if (ChessGUI.isWhitePovGlobal) { // Top King && White POV
                 if (!ChessGUI.topRightRookMoved && boardData[5][0] == null && boardData[6][0] == null) {
                     maybeCanCastle.add(new int[]{6, 0});

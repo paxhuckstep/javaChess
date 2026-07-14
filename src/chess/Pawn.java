@@ -17,7 +17,8 @@ public class Pawn extends Piece {
 
         // one square forward
         int inFront = pawnRow + upOrDown;
-        if (inFront >= 0 && inFront < 8) {
+        if (inFront >= 0 && inFront < 8) { //wtf is this if why is it here, I think it's old code from before
+            // promotions were added but I'm not sure
             candidateMoves.add(new int[]{pawnColumn, inFront});
 
             // double jumps

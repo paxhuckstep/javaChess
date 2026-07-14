@@ -186,7 +186,7 @@ public class ChessGUI extends JPanel {
         refreshBoard(flippedBoardData);
     }
 
-    public void movePiece(int[] startSquare, int[] endSquare, Piece movedPiece, boolean autoQueen) {
+    public void movePiece(int[] startSquare, int[] endSquare, Piece movedPiece, boolean isAutoQueen) {
         //HANDLE EN PESSANT CAPTURE ...
         //goes BEFORE!!! movement happens in boardData
         // checks if destination empty (always full after movement happens.. the moved piece is there)
@@ -303,7 +303,7 @@ public class ChessGUI extends JPanel {
 
         //handlePromotion
         if (movedPiece instanceof Pawn && (endSquare[1] == 0 || endSquare[1] == 7)) {
-            if (!autoQueen) {
+            if (!isAutoQueen) {
                 String promotionPiece = PromotionGUI.openPromotionPopup(BigGUI.bigGuiReference, movedPiece.getIsWhite());
                 switch (promotionPiece) {
                     case "queen":
@@ -372,8 +372,8 @@ public class ChessGUI extends JPanel {
         int tries = 0;
         while (tries < 17) {
             int[] randomCoordinates = allMyPieceCoordinates.get(randomCoordinatesIndex);
-            Piece tryToMove = boardData[randomCoordinates[0]][randomCoordinates[1]];
-            List<int[]> legalMoves = getPieceLegalMoves(tryToMove, randomCoordinates[0], randomCoordinates[1]);
+            Piece randomPiece = boardData[randomCoordinates[0]][randomCoordinates[1]];
+            List<int[]> legalMoves = getPieceLegalMoves(randomPiece, randomCoordinates[0], randomCoordinates[1]);
             if (legalMoves.isEmpty()) { //Random Piece can't move
                 tries++;
                 if (randomCoordinatesIndex == allMyPieceCoordinates.size() - 1) {
@@ -384,7 +384,7 @@ public class ChessGUI extends JPanel {
             } else { //Randomly move random piece
                 int randomMoveIndex = (int) Math.floor(legalMoves.size() * Math.random());
                 int[] theMove = legalMoves.get(randomMoveIndex);
-                movePiece(randomCoordinates, theMove, tryToMove, true);
+                movePiece(randomCoordinates, theMove, randomPiece, true);
                 tries = 18;
             }
         }
